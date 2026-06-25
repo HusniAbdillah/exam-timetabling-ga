@@ -58,23 +58,26 @@ Arsitektur proyek mengikuti beberapa prinsip berikut.
 
 ```text
 exam-timetabling-ga/
-
+│
 ├── app/
 ├── data/
+├── development/
+│   ├── standards/
+│   │   ├── CODING_STANDARD.md
+│   │   ├── DATA_SPEC.md
+│   │   └── TYPE_GUIDELINES.md
+│   ├── GIT_WORKFLOW.md
+│   ├── TEAM_TASKS.md
+│   └── UV_SETUP.md
 ├── docs/
 ├── outputs/
 ├── src/
-├── tests/
+└── tests/
 
 README.md
 PRD.md
 ARCHITECTURE.md
-DATA_SPEC.md
-TYPE_GUIDELINES.md
-CODING_STANDARD.md
 CONTRIBUTING.md
-UV_SETUP.md
-GIT_WORKFLOW.md
 pyproject.toml
 ```
 
@@ -85,13 +88,14 @@ pyproject.toml
 ```text
 src/
 
+├── config/
+├── models/
 ├── preprocessing/
 ├── ga/
 ├── fitness/
 ├── evaluation/
 ├── visualization/
-├── utils/
-└── config/
+└── utils/
 ```
 
 ---
@@ -287,8 +291,8 @@ Output disimpan pada direktori:
 outputs/
 
 schedule.csv
-fitness.csv
-result.json
+fitness_history.csv
+statistics.json
 ```
 
 ---

@@ -111,6 +111,18 @@ Soft Constraint digunakan untuk meningkatkan kualitas jadwal.
 * Mengurangi jumlah ujian dalam satu hari.
 * Menyebarkan ujian secara lebih merata pada seluruh slot.
 
+## Rumus Evaluasi Penalti
+
+Optimasi dilakukan dengan meminimalkan total penalti (*lower penalty is better*). Rumus perhitungan penalti didefinisikan sebagai:
+
+$$\text{penalty} = 1000 \times \text{Hard Constraint} + 10 \times \text{Consecutive Exams} + 5 \times \text{Too Many Exams Per Day} + 2 \times \text{Spread Penalty}$$
+
+Di mana:
+* **Hard Constraint**: Jumlah mahasiswa yang memiliki jadwal ujian bentrok (pada slot yang sama).
+* **Consecutive Exams**: Jumlah kejadian mahasiswa memiliki ujian berurutan/berturut-turut pada hari yang sama.
+* **Too Many Exams Per Day**: Jumlah kejadian mahasiswa memiliki lebih dari dua ujian dalam satu hari.
+* **Spread Penalty**: Penalti penyebaran ujian untuk mengukur ketidakmerataan distribusi ujian pada slot waktu yang tersedia.
+
 ---
 
 # 7. Dataset
@@ -153,13 +165,11 @@ Tujuannya adalah memberikan gambaran peningkatan kualitas solusi yang dihasilkan
 
 # 10. Output
 
-Aplikasi menghasilkan:
+Aplikasi menghasilkan berkas keluaran berikut pada direktori `outputs/`:
 
-* Jadwal ujian terbaik.
-* Nilai fitness.
-* Grafik perkembangan fitness.
-* Statistik konflik.
-* Perbandingan Genetic Algorithm dan Greedy.
+* `outputs/schedule.csv`: Jadwal ujian terbaik.
+* `outputs/fitness_history.csv`: Nilai fitness setiap generasi.
+* `outputs/statistics.json`: Statistik konflik dan perbandingan performa (GA vs Greedy).
 
 ---
 

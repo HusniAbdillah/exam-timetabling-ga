@@ -51,20 +51,24 @@ exam-timetabling-ga
 │
 ├── app/
 ├── data/
+├── development/
+│   ├── standards/
+│   │   ├── CODING_STANDARD.md
+│   │   ├── DATA_SPEC.md
+│   │   └── TYPE_GUIDELINES.md
+│   ├── GIT_WORKFLOW.md
+│   ├── TEAM_TASKS.md
+│   └── UV_SETUP.md
 ├── docs/
 ├── outputs/
 ├── src/
+│   └── models/
 ├── tests/
 │
 ├── README.md
 ├── PRD.md
 ├── ARCHITECTURE.md
-├── DATA_SPEC.md
-├── TYPE_GUIDELINES.md
-├── CODING_STANDARD.md
 ├── CONTRIBUTING.md
-├── UV_SETUP.md
-├── GIT_WORKFLOW.md
 ├── pyproject.toml
 └── uv.lock
 ```

@@ -300,8 +300,7 @@ Input
 
 Output
 
-* Best Chromosome
-* Fitness History
+* GAResult
 
 ---
 
@@ -314,7 +313,18 @@ Input
 
 Output
 
-* Fitness Value
+* Fitness Value (Evaluasi Pinalti)
+
+### Rumus Evaluasi Penalti
+Optimasi dilakukan dengan meminimalkan total penalti (*lower penalty is better*). Rumus perhitungan penalti didefinisikan sebagai:
+
+$$\text{penalty} = 1000 \times \text{Hard Constraint} + 10 \times \text{Consecutive Exams} + 5 \times \text{Too Many Exams Per Day} + 2 \times \text{Spread Penalty}$$
+
+Di mana:
+* **Hard Constraint**: Jumlah mahasiswa yang memiliki jadwal ujian bentrok (pada slot yang sama).
+* **Consecutive Exams**: Jumlah kejadian mahasiswa memiliki ujian berurutan/berturut-turut pada hari yang sama.
+* **Too Many Exams Per Day**: Jumlah kejadian mahasiswa memiliki lebih dari dua ujian dalam satu hari.
+* **Spread Penalty**: Penalti penyebaran ujian untuk mengukur ketidakmerataan distribusi ujian pada slot waktu yang tersedia.
 
 ---
 
@@ -322,14 +332,11 @@ Output
 
 Input
 
-* Best Chromosome
-* Fitness History
+* GAResult
 
 Output
 
-* Statistik
-* Perbandingan Greedy
-* Runtime
+* EvaluationResult
 
 ---
 
@@ -337,8 +344,8 @@ Output
 
 Input
 
-* Best Chromosome
-* Statistik
+* GAResult
+* EvaluationResult
 
 Output
 
@@ -357,7 +364,7 @@ outputs/
 
 schedule.csv
 fitness_history.csv
-summary.json
+statistics.json
 ```
 
 ---
