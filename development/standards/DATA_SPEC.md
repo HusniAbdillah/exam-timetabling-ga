@@ -367,6 +367,65 @@ fitness_history.csv
 statistics.json
 ```
 
+### 13.1 schedule.csv
+Menyimpan hasil pemetaan mata kuliah ke slot waktu ujian yang terpilih.
+
+| Field | Tipe | Keterangan |
+| --- | --- | --- |
+| course_id | string | ID mata kuliah |
+| course_name | string | Nama mata kuliah |
+| slot_id | integer | ID slot waktu ujian |
+| day | integer | Hari ujian |
+| session | integer | Sesi ujian |
+
+Contoh isi:
+```csv
+course_id,course_name,slot_id,day,session
+IF301,Struktur Data,5,2,1
+MKU101,Pancasila,1,1,1
+```
+
+### 13.2 fitness_history.csv
+Menyimpan perkembangan nilai fitness (penalti terbaik) dari setiap generasi selama GA berjalan.
+
+| Field | Tipe | Keterangan |
+| --- | --- | --- |
+| generation | integer | Generasi ke-n (0-indexed) |
+| best_fitness | float | Nilai fitness (penalti) terbaik pada generasi tersebut |
+
+Contoh isi:
+```csv
+generation,best_fitness
+0,1520.0
+1,1210.0
+2,850.0
+```
+
+### 13.3 statistics.json
+Menyimpan perbandingan performa antara algoritma Genetic Algorithm (GA) dan Greedy baseline, beserta rincian pelanggaran batasannya (constraint).
+
+Format berkas JSON:
+```json
+{
+  "ga": {
+    "execution_time_seconds": float,
+    "best_fitness": float,
+    "hard_constraint_violations": integer,
+    "consecutive_exams_violations": integer,
+    "too_many_exams_violations": integer,
+    "spread_penalty": float
+  },
+  "greedy": {
+    "execution_time_seconds": float,
+    "best_fitness": float,
+    "hard_constraint_violations": integer,
+    "consecutive_exams_violations": integer,
+    "too_many_exams_violations": integer,
+    "spread_penalty": float
+  }
+}
+```
+
 ---
 
 # 14. Validasi Dataset

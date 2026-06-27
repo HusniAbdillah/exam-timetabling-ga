@@ -1,0 +1,51 @@
+course_id,course_name,slot_id,day,session
+MKU101,Pancasila,11,4,2
+MKU102,Pendidikan Agama,2,1,2
+MKU103,Bahasa Indonesia,1,1,1
+MKU104,Bahasa Inggris,12,4,3
+MKU105,Kewirausahaan,5,2,2
+FTE201,Fisika Dasar,4,2,1
+FTE202,Kalkulus I,4,2,1
+FTE203,Kalkulus II,3,1,3
+FTE204,Matriks dan Ruang Vektor,12,4,3
+FTE205,Probabilitas dan Statistika,2,1,2
+IF301,Dasar Pemrograman,11,4,2
+IF302,Struktur Data,12,4,3
+IF303,Algoritma Pemrograman,15,5,3
+IF304,Basis Data,9,3,3
+IF305,Pemrograman Berorientasi Objek,2,1,2
+IF306,Sistem Operasi,10,4,1
+IF307,Jaringan Komputer,7,3,1
+IF308,Analisis dan Perancangan Perangkat Lunak,1,1,1
+IF309,Kecerdasan Buatan,1,1,1
+IF310,Grafika Komputer,2,1,2
+SI301,Pengantar Sistem Informasi,4,2,1
+SI302,Analisis Proses Bisnis,4,2,1
+SI303,Manajemen Proyek TI,9,3,3
+SI304,Sistem Informasi Perusahaan,10,4,1
+SI305,E-Business,1,1,1
+TK301,Organisasi dan Arsitektur Komputer,9,3,3
+TK302,Sistem Tertanam,4,2,1
+TK303,Mikrokontroler,12,4,3
+TK304,Sinyal dan Sistem,11,4,2
+TK305,Elektronika Digital,12,4,3
+TI301,Pengantar Teknik Industri,9,3,3
+TI302,Penelitian Operasional I,7,3,1
+TI303,Penelitian Operasional II,4,2,1
+TI304,Ergonomi,8,3,2
+TI305,Perencanaan dan Pengendalian Produksi,10,4,1
+MA301,Aljabar Linear,5,2,2
+MA302,Metode Numerik,13,5,1
+MA303,Logika Matematika,14,5,2
+MA304,Matematika Diskrit,1,1,1
+MA305,Persamaan Diferensial,13,5,1
+FI301,Mekanika,13,5,1
+FI302,Termodinamika,3,1,3
+FI303,Fisika Modern,12,4,3
+FI304,Elektromagnetika,7,3,1
+FI305,Optika,6,2,3
+KI301,Kimia Dasar I,5,2,2
+KI302,Kimia Dasar II,3,1,3
+KI303,Kimia Organik,4,2,1
+KI304,Kimia Analitik,13,5,1
+KI305,Biokimia,6,2,3
