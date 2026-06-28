@@ -1,18 +1,18 @@
 {
   "ga": {
-    "execution_time_seconds": 12.48,
-    "best_fitness": 75.0,
+    "execution_time_seconds": 26.561999999990803,
+    "best_fitness": 3.7777777777777786,
     "hard_constraint_violations": 0,
-    "consecutive_exams_violations": 4,
-    "too_many_exams_violations": 1,
-    "spread_penalty": 15.0
+    "consecutive_exams_violations": 0,
+    "too_many_exams_violations": 0,
+    "spread_penalty": 0.8888888888888892
   },
   "greedy": {
-    "execution_time_seconds": 0.08,
-    "best_fitness": 2520.0,
-    "hard_constraint_violations": 2,
-    "consecutive_exams_violations": 17,
-    "too_many_exams_violations": 8,
-    "spread_penalty": 45.0
+    "execution_time_seconds": 2.9070000000065193,
+    "best_fitness": 0.4444444444444444,
+    "hard_constraint_violations": 0,
+    "consecutive_exams_violations": 0,
+    "too_many_exams_violations": 0,
+    "spread_penalty": 0.2222222222222222
   }
 }
