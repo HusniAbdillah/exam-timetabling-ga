@@ -77,7 +77,7 @@ def run_sensitivity_analysis(
     for r in results:
         gens = [0, 10, 20, 30, 40, 50]
         fitness = [r[f"gen_{g}"] for g in gens if r[f"gen_{g}"] is not None]
-        x_vals = gens[:len(fitness)]
+        x_vals = gens[: len(fitness)]
         plt.plot(
             x_vals,
             fitness,

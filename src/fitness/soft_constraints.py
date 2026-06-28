@@ -199,4 +199,3 @@ def calculate_friday_afternoon_penalty(
             if day == 5 and session == 3:
                 violations += 1
     return violations
-

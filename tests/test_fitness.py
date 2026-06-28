@@ -144,4 +144,3 @@ def test_friday_afternoon_penalty():
     assert stats["friday_afternoon_violations"] == 1
     # Check that total penalty includes Friday Afternoon weight (5.0)
     assert stats["total_penalty"] >= 5.0
-

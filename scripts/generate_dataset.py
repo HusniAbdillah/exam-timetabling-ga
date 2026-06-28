@@ -11,6 +11,7 @@ from src.utils.constants import (
     TIMESLOTS_CSV,
 )
 
+
 def generate_dataset() -> None:
     """Generate a highly constrained realistic dataset for testing exam timetabling.
 
@@ -235,7 +236,9 @@ def generate_dataset() -> None:
     }
 
     for dept, c_list in dept_course_templates.items():
-        fac_id = next(fac for fac, depts in FACULTY_DEPARTMENTS.items() if dept in depts)
+        fac_id = next(
+            fac for fac, depts in FACULTY_DEPARTMENTS.items() if dept in depts
+        )
         for cid, name, sem in c_list:
             courses.append(
                 {
@@ -349,7 +352,10 @@ def generate_dataset() -> None:
                     # 1. General course of the semester (taken by ALL students in that sem)
                     if sem in general_courses_by_sem:
                         enrollments.append(
-                            {"student_id": sid, "course_id": general_courses_by_sem[sem]}
+                            {
+                                "student_id": sid,
+                                "course_id": general_courses_by_sem[sem],
+                            }
                         )
 
                     # 2. Faculty core courses (taken by semesters 1 and 2)
@@ -379,7 +385,9 @@ def generate_dataset() -> None:
                                 courses_by_sem_and_dept[(lower_sem, dept)], k=2
                             )
                             for rcid in repeats:
-                                enrollments.append({"student_id": sid, "course_id": rcid})
+                                enrollments.append(
+                                    {"student_id": sid, "course_id": rcid}
+                                )
 
                     # 6. Cross-Department Enrollments (30% chance)
                     # Links departments together globally
@@ -390,7 +398,13 @@ def generate_dataset() -> None:
 
     with open(STUDENTS_CSV, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
-            f, fieldnames=["student_id", "faculty_id", "department_id", "current_semester"]
+            f,
+            fieldnames=[
+                "student_id",
+                "faculty_id",
+                "department_id",
+                "current_semester",
+            ],
         )
         writer.writeheader()
         writer.writerows(students)
@@ -405,6 +419,7 @@ def generate_dataset() -> None:
     print(f"- {len(courses)} courses saved to {COURSES_CSV}")
     print(f"- {len(students)} students saved to {STUDENTS_CSV}")
     print(f"- {len(enrollments)} enrollments saved to {ENROLLMENTS_CSV}")
+
 
 if __name__ == "__main__":
     generate_dataset()

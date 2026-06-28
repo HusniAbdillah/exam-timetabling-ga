@@ -63,9 +63,7 @@ def plot_conflict_heatmap(enrollments_file: Path, courses_file: Path) -> go.Figu
             colorscale="Plasma",
             colorbar=dict(title="Siswa Bentrok"),
             hovertemplate=(
-                "Matkul X: %{x}<br>"
-                "Matkul Y: %{y}<br>"
-                "Siswa Bentrok: %{z}<extra></extra>"
+                "Matkul X: %{x}<br>Matkul Y: %{y}<br>Siswa Bentrok: %{z}<extra></extra>"
             ),
         )
     )

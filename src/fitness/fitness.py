@@ -141,9 +141,7 @@ def calculate_fitness(
         chromosome, _course_indices, _timeslot_map, _high_enrollment_courses
     )
 
-    friday_afternoon_val = calculate_friday_afternoon_penalty(
-        chromosome, _timeslot_map
-    )
+    friday_afternoon_val = calculate_friday_afternoon_penalty(chromosome, _timeslot_map)
 
     # 3. Sum penalties weighted
     total_penalty = (
@@ -198,9 +196,7 @@ def evaluate_constraints(chromosome: Chromosome) -> dict[str, float | int]:
     high_enroll = calculate_high_enrollment_separation(
         chromosome, _course_indices, _timeslot_map, _high_enrollment_courses
     )
-    friday_afternoon = calculate_friday_afternoon_penalty(
-        chromosome, _timeslot_map
-    )
+    friday_afternoon = calculate_friday_afternoon_penalty(chromosome, _timeslot_map)
 
     return {
         "hard_constraint_violations": hc,
