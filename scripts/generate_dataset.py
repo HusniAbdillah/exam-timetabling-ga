@@ -1,6 +1,6 @@
 import csv
 import random
-
+from pathlib import Path
 from src.utils.constants import (
     COURSES_CSV,
     ENROLLMENTS_CSV,
@@ -11,7 +11,6 @@ from src.utils.constants import (
     TIMESLOTS_CSV,
 )
 
-
 def generate_dataset() -> None:
     """Generate a highly constrained realistic dataset for testing exam timetabling.
 
@@ -19,10 +18,8 @@ def generate_dataset() -> None:
     - 5 Faculties, each containing 2 Departments (total 10 departments).
     - 8 semesters of students, with ~130 students per department (total ~1300).
     - A multi-layered course structure (General, Faculty, Department, Electives).
-    - Repeating students (students in odd semesters retaking lower courses).
-    - Cross-department enrollments (e.g., Computer Science taking Statistics).
-    - Choice of electives by senior students.
-    - 15 available exam timeslots (5 days, 3 sessions per day).
+    - Extremely high-density conflicts: Students take 6-7 courses per semester.
+    - 10 available exam timeslots (5 days, 2 sessions per day).
     """
     random.seed(42)  # For reproducibility
 
@@ -30,12 +27,12 @@ def generate_dataset() -> None:
     COURSES_CSV.parent.mkdir(parents=True, exist_ok=True)
 
     # ---------------------------------------------------------------------------
-    # 1. Generate Timeslots
+    # 1. Generate Timeslots (5 days, 2 sessions per day = 10 timeslots)
     # ---------------------------------------------------------------------------
     timeslots = []
     slot_id = 1
     for day in range(1, 6):  # 5 days
-        for session in range(1, 4):  # 3 sessions per day
+        for session in range(1, 3):  # 2 sessions per day (Pagi & Siang)
             timeslots.append({"slot_id": slot_id, "day": day, "session": session})
             slot_id += 1
 
@@ -56,6 +53,9 @@ def generate_dataset() -> None:
         ("GEN103", "Bahasa Indonesia", 3),
         ("GEN104", "Bahasa Inggris", 4),
         ("GEN105", "Kewirausahaan", 5),
+        ("GEN201", "Metode Ilmiah", 6),
+        ("GEN202", "Pendidikan Kewarganegaraan", 7),
+        ("GEN203", "Etika Profesi", 8),
     ]
     for cid, name, sem in general_courses:
         courses.append(
@@ -71,83 +71,171 @@ def generate_dataset() -> None:
 
     # 2.2 Faculty Core Courses (Taken by all students within a faculty)
     faculty_cores = {
-        "FMIPA": ("FMA101", "Kalkulus", 1),
-        "FATETA": ("FTA101", "Fisika Dasar", 1),
-        "FEM": ("FEM101", "Pengantar Ekonomi", 1),
-        "FEMA": ("FMA102", "Sosiologi Umum", 1),
-        "FAPET": ("FPT101", "Biologi Umum", 1),
+        "FMIPA": [("FMA101", "Kalkulus I", 1), ("FMA102", "Aljabar Linear", 2)],
+        "FATETA": [("FTA101", "Fisika Dasar I", 1), ("FTA102", "Kimia Dasar", 2)],
+        "FEM": [("FEM101", "Pengantar Ekonomi", 1), ("FEM102", "Pengantar Bisnis", 2)],
+        "FEMA": [("FMA201", "Sosiologi Umum", 1), ("FMA202", "Ekologi Manusia", 2)],
+        "FAPET": [("FPT101", "Biologi Umum", 1), ("FPT102", "Pengantar Peternakan", 2)],
     }
-    for fac, (cid, name, sem) in faculty_cores.items():
-        courses.append(
-            {
-                "course_id": cid,
-                "course_name": name,
-                "faculty_id": fac,
-                "department_id": GENERAL_DEPARTMENT,
-                "offered_semester": sem,
-                "course_type": "FACULTY",
-            }
-        )
+    for fac, list_cores in faculty_cores.items():
+        for cid, name, sem in list_cores:
+            courses.append(
+                {
+                    "course_id": cid,
+                    "course_name": name,
+                    "faculty_id": fac,
+                    "department_id": GENERAL_DEPARTMENT,
+                    "offered_semester": sem,
+                    "course_type": "FACULTY",
+                }
+            )
 
-    # 2.3 Department Core Courses (Offered in semester 2, 4, and 6)
+    # 2.3 Department Core Courses (4 per semester for semesters 2, 4, 6)
     dept_course_templates = {
         "ILKOM": [
             ("KOM201", "Pemrograman Dasar", 2),
+            ("KOM202", "PBO", 2),
+            ("KOM203", "Matematika Diskrit", 2),
+            ("KOM204", "Arsitektur Komputer", 2),
             ("KOM401", "Struktur Data", 4),
-            ("KOM601", "Basis Data", 6),
+            ("KOM402", "Sistem Operasi", 4),
+            ("KOM403", "Analisis Algoritma", 4),
+            ("KOM404", "Basis Data", 4),
+            ("KOM601", "Jaringan Komputer", 6),
+            ("KOM602", "Rekayasa Perangkat Lunak", 6),
+            ("KOM603", "Kecerdasan Buatan", 6),
+            ("KOM604", "Grafika Komputer", 6),
         ],
         "STAT": [
             ("STT201", "Metode Statistika I", 2),
+            ("STT202", "Statistika Deskriptif", 2),
+            ("STT203", "Matematika Statistika", 2),
+            ("STT204", "Metode Pengambilan Sampel", 2),
             ("STT401", "Statistika Matematika I", 4),
+            ("STT402", "Komputasi Statistika", 4),
+            ("STT403", "Analisis Data Kategori", 4),
+            ("STT404", "Rancangan Percobaan I", 4),
             ("STT601", "Analisis Regresi", 6),
+            ("STT602", "Analisis Deret Waktu", 6),
+            ("STT603", "Statistika Nonparametrik", 6),
+            ("STT604", "Multivariat Statistika", 6),
         ],
         "TIN": [
             ("TIN201", "Pengantar Industri Pertanian", 2),
+            ("TIN202", "Kimia Organik Industri", 2),
+            ("TIN203", "Mikrobiologi Industri", 2),
+            ("TIN204", "Satuan Operasi I", 2),
             ("TIN401", "Analisis Sistem Industri", 4),
+            ("TIN402", "Ekonomi Teknik", 4),
+            ("TIN403", "Teknik Tata Cara Kerja", 4),
+            ("TIN404", "Perancangan Produk", 4),
             ("TIN601", "Pengendalian Mutu", 6),
+            ("TIN602", "Tata Letak Pabrik", 6),
+            ("TIN603", "Pemasaran Industri", 6),
+            ("TIN604", "Manajemen Strategik", 6),
         ],
         "TEP": [
             ("TEP201", "Teknik Biosistem", 2),
+            ("TEP202", "Menggambar Teknik", 2),
+            ("TEP203", "Mekanika Teknik", 2),
+            ("TEP204", "Dasar Biosistem", 2),
             ("TEP401", "Termodinamika", 4),
+            ("TEP402", "Mekanika Fluida", 4),
+            ("TEP403", "Kelistrikan Pertanian", 4),
+            ("TEP404", "Energi dan Mesin Pertanian", 4),
             ("TEP601", "Alat Mesin Pertanian", 6),
+            ("TEP602", "Teknik Pascapanen", 6),
+            ("TEP603", "Instrumentasi Pengendalian", 6),
+            ("TEP604", "Sistem Informasi Geografi", 6),
         ],
         "MAN": [
             ("MAN201", "Pengantar Manajemen", 2),
+            ("MAN202", "Perilaku Organisasi", 2),
+            ("MAN203", "Ekonomi Mikro Manajerial", 2),
+            ("MAN204", "Akuntansi Manajemen", 2),
             ("MAN401", "Manajemen Keuangan", 4),
+            ("MAN402", "Manajemen Pemasaran", 4),
+            ("MAN403", "Manajemen Operasi", 4),
+            ("MAN404", "Riset Pemasaran", 4),
             ("MAN601", "Manajemen Strategik", 6),
+            ("MAN602", "Kewirausahaan", 6),
+            ("MAN603", "Manajemen SDM", 6),
+            ("MAN604", "Bisnis Internasional", 6),
         ],
         "EKO": [
             ("EKO201", "Mikroekonomi I", 2),
+            ("EKO202", "Matematika Ekonomi", 2),
+            ("EKO203", "Statistika Ekonomi", 2),
+            ("EKO204", "Akuntansi Dasar", 2),
             ("EKO401", "Makroekonomi I", 4),
+            ("EKO402", "Ekonometrika I", 4),
+            ("EKO403", "Ekonomi Moneter I", 4),
+            ("EKO404", "Ekonomi Publik I", 4),
             ("EKO601", "Ekonomi Pembangunan", 6),
+            ("EKO602", "Sejarah Pemikiran Ekonomi", 6),
+            ("EKO603", "Ekonomi Internasional", 6),
+            ("EKO604", "Ekonomi Regional", 6),
         ],
         "GIZ": [
             ("GIZ201", "Dasar Nutrisi", 2),
+            ("GIZ202", "Kimia Gizi", 2),
+            ("GIZ203", "Anatomi Fisiologi", 2),
+            ("GIZ204", "Sosio-Antropologi Gizi", 2),
             ("GIZ401", "Dietetika", 4),
+            ("GIZ402", "Gizi Daur Kehidupan", 4),
+            ("GIZ403", "Penilaian Status Gizi", 4),
+            ("GIZ404", "Kemanan Pangan", 4),
             ("GIZ601", "Gizi Masyarakat", 6),
+            ("GIZ602", "Konseling Gizi", 6),
+            ("GIZ603", "Gizi Olahraga", 6),
+            ("GIZ604", "Epidemiologi Gizi", 6),
         ],
         "KPM": [
             ("KPM201", "Pengantar Sosiologi", 2),
+            ("KPM202", "Antropologi Sosial", 2),
+            ("KPM203", "Ekologi Politik", 2),
+            ("KPM204", "Dasar Komunikasi", 2),
             ("KPM401", "Penyuluhan Pembangunan", 4),
+            ("KPM402", "Sosiologi Pedesaan", 4),
+            ("KPM403", "Metode Penelitian Sosial", 4),
+            ("KPM404", "Gender dan Pembangunan", 4),
             ("KPM601", "Komunikasi Politik", 6),
+            ("KPM602", "Pengembangan Kelembagaan", 6),
+            ("KPM603", "Resolusi Konflik", 6),
+            ("KPM604", "Corporate Social Responsibility", 6),
         ],
         "INTP": [
             ("INTP201", "Anatomi Ternak", 2),
+            ("INTP202", "Dasar Fisiologi Ternak", 2),
+            ("INTP203", "Dasar Genetika Ternak", 2),
+            ("INTP204", "Pengantar Ilmu Pakan", 2),
             ("INTP401", "Nutrisi Ternak", 4),
+            ("INTP402", "Bahan Pakan Ternak", 4),
+            ("INTP403", "Tatalaksana Padang Penggembalaan", 4),
+            ("INTP404", "Manajemen Ternak Potong", 4),
             ("INTP601", "Fisiologi Reproduksi", 6),
+            ("INTP602", "Pemuliaan Ternak", 6),
+            ("INTP603", "Teknologi Pakan", 6),
+            ("INTP604", "Tatalaksana Ternak Perah", 6),
         ],
         "IPB": [
             ("IPB201", "Dasar Agronomi", 2),
+            ("IPB202", "Dasar Genetika Tumbuhan", 2),
+            ("IPB203", "Dasar Hortikultura", 2),
+            ("IPB204", "Kesuburan Tanah", 2),
             ("IPB401", "Fisiologi Tumbuhan", 4),
+            ("IPB402", "Agroklimatologi", 4),
+            ("IPB403", "Ilmu Gulma", 4),
+            ("IPB404", "Teknologi Benih I", 4),
             ("IPB601", "Perlindungan Tanaman", 6),
+            ("IPB602", "Pemuliaan Tanaman", 6),
+            ("IPB603", "Bioteknologi Tanaman", 6),
+            ("IPB604", "Pertanian Berkelanjutan", 6),
         ],
     }
 
     for dept, c_list in dept_course_templates.items():
-        # Find which faculty this department belongs to
-        fac_id = next(
-            fac for fac, depts in FACULTY_DEPARTMENTS.items() if dept in depts
-        )
+        fac_id = next(fac for fac, depts in FACULTY_DEPARTMENTS.items() if dept in depts)
         for cid, name, sem in c_list:
             courses.append(
                 {
@@ -163,15 +251,17 @@ def generate_dataset() -> None:
     # 2.4 Elective Courses (Offered in semester 7, taken by senior students)
     electives = [
         ("KOM701", "Deep Learning", "FMIPA", "ILKOM"),
+        ("KOM702", "Cloud Computing", "FMIPA", "ILKOM"),
         ("STT701", "Big Data Analytics", "FMIPA", "STAT"),
+        ("STT702", "Machine Learning", "FMIPA", "STAT"),
         ("TIN701", "Logistik Rantai Pasok", "FATETA", "TIN"),
         ("TEP701", "Energi Terbarukan", "FATETA", "TEP"),
         ("MAN701", "Perilaku Konsumen", "FEM", "MAN"),
-        ("EKO701", "Ekonometrika", "FEM", "EKO"),
+        ("EKO701", "Ekonometrika Terapan", "FEM", "EKO"),
         ("GIZ701", "Pangan Fungsional", "FEMA", "GIZ"),
         ("KPM701", "Pengembangan Masyarakat", "FEMA", "KPM"),
         ("INTP701", "Industri Pakan", "FAPET", "INTP"),
-        ("IPB701", "Pemuliaan Tanaman", "FAPET", "IPB"),
+        ("IPB701", "Pemuliaan Tanaman Lanjut", "FAPET", "IPB"),
     ]
     for cid, name, fac, dept in electives:
         courses.append(
@@ -222,18 +312,27 @@ def generate_dataset() -> None:
         if ctype == "GENERAL":
             general_courses_by_sem[sem] = cid
         elif ctype == "FACULTY":
-            courses_by_sem_and_fac[(sem, fac)] = cid
+            if (sem, fac) not in courses_by_sem_and_fac:
+                courses_by_sem_and_fac[(sem, fac)] = []
+            courses_by_sem_and_fac[(sem, fac)].append(cid)
         elif ctype == "DEPARTMENT":
-            courses_by_sem_and_dept[(sem, dept)] = cid
+            if (sem, dept) not in courses_by_sem_and_dept:
+                courses_by_sem_and_dept[(sem, dept)] = []
+            courses_by_sem_and_dept[(sem, dept)].append(cid)
 
-    elective_ids = [c["course_id"] for c in courses if c["course_type"] == "ELECTIVE"]
+    elective_ids_by_dept = {}
+    for c in courses:
+        if c["course_type"] == "ELECTIVE":
+            d = c["department_id"]
+            if d not in elective_ids_by_dept:
+                elective_ids_by_dept[d] = []
+            elective_ids_by_dept[d].append(c["course_id"])
 
     for fac, depts in FACULTY_DEPARTMENTS.items():
         for dept in depts:
-            # 130 students per department, distributed evenly over 8 semesters
-            # Semester 1-8. Let's create ~16 students per semester.
+            # ~16 students per semester, total ~130 per department
             for sem in range(1, 9):
-                num_students_in_sem = 16 if sem != 8 else 18  # 16 * 7 + 18 = 130
+                num_students_in_sem = 16 if sem != 8 else 18
                 for _ in range(num_students_in_sem):
                     sid = f"S{student_counter:04d}"
                     student_counter += 1
@@ -247,76 +346,51 @@ def generate_dataset() -> None:
                         }
                     )
 
-                    # Enroll in general courses for this semester (if applicable)
+                    # 1. General course of the semester (taken by ALL students in that sem)
                     if sem in general_courses_by_sem:
                         enrollments.append(
-                            {
-                                "student_id": sid,
-                                "course_id": general_courses_by_sem[sem],
-                            }
+                            {"student_id": sid, "course_id": general_courses_by_sem[sem]}
                         )
 
-                    # Enroll in faculty core course for semester 1
-                    if sem == 1 and (1, fac) in courses_by_sem_and_fac:
-                        enrollments.append(
-                            {
-                                "student_id": sid,
-                                "course_id": courses_by_sem_and_fac[(1, fac)],
-                            }
-                        )
+                    # 2. Faculty core courses (taken by semesters 1 and 2)
+                    if sem in [1, 2] and (sem, fac) in courses_by_sem_and_fac:
+                        for fcid in courses_by_sem_and_fac[(sem, fac)]:
+                            enrollments.append({"student_id": sid, "course_id": fcid})
 
-                    # Enroll in department core course for the student's semester
-                    # (e.g. sem 2, 4, 6)
-                    # To be realistic, students take their current semester's core.
+                    # 3. Department core courses (taken by semesters 2, 4, 6)
+                    # Students take ALL 4 core courses offered in their semester
                     dept_sem = sem if sem in [2, 4, 6] else None
                     if dept_sem and (dept_sem, dept) in courses_by_sem_and_dept:
-                        enrollments.append(
-                            {
-                                "student_id": sid,
-                                "course_id": courses_by_sem_and_dept[(dept_sem, dept)],
-                            }
-                        )
+                        for cid in courses_by_sem_and_dept[(dept_sem, dept)]:
+                            enrollments.append({"student_id": sid, "course_id": cid})
 
-                    # Simulate Repeating Students (15% chance for semesters 3, 5, 7)
-                    if sem in [3, 5, 7] and random.random() < 0.15:
+                    # 4. Elective courses (taken by senior semesters 5-8)
+                    if sem in [5, 6, 7, 8] and dept in elective_ids_by_dept:
+                        # Senior students enroll in all electives of their department
+                        for ecid in elective_ids_by_dept[dept]:
+                            enrollments.append({"student_id": sid, "course_id": ecid})
+
+                    # 5. Repeating Students (30% chance for semesters 3, 5, 7)
+                    if sem in [3, 5, 7] and random.random() < 0.30:
                         lower_sem = sem - 1
                         if (lower_sem, dept) in courses_by_sem_and_dept:
-                            enrollments.append(
-                                {
-                                    "student_id": sid,
-                                    "course_id": courses_by_sem_and_dept[
-                                        (lower_sem, dept)
-                                    ],
-                                }
+                            # Enroll in 2 random core courses from the lower semester
+                            repeats = random.sample(
+                                courses_by_sem_and_dept[(lower_sem, dept)], k=2
                             )
+                            for rcid in repeats:
+                                enrollments.append({"student_id": sid, "course_id": rcid})
 
-                    # Simulate Cross-Department Enrollments (10% chance)
-                    # E.g. ILKOM students in sem 4 take STAT methods;
-                    # STAT students take ILKOM Data Structures (KOM401).
-                    if dept == "ILKOM" and sem == 4 and random.random() < 0.10:
-                        # Enroll in STAT Metode Statistika I (STT201)
+                    # 6. Cross-Department Enrollments (30% chance)
+                    # Links departments together globally
+                    if dept == "ILKOM" and sem == 4 and random.random() < 0.30:
                         enrollments.append({"student_id": sid, "course_id": "STT201"})
-                    elif dept == "STAT" and sem == 4 and random.random() < 0.10:
-                        # Enroll in ILKOM Struktur Data (KOM401)
+                    elif dept == "STAT" and sem == 4 and random.random() < 0.30:
                         enrollments.append({"student_id": sid, "course_id": "KOM401"})
-
-                    # Simulate Electives for Senior Students (Semesters 5-8)
-                    if sem in [5, 6, 7, 8]:
-                        # Pick 1 random elective from the global elective list
-                        chosen_elective = random.choice(elective_ids)
-                        enrollments.append(
-                            {"student_id": sid, "course_id": chosen_elective}
-                        )
 
     with open(STUDENTS_CSV, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
-            f,
-            fieldnames=[
-                "student_id",
-                "faculty_id",
-                "department_id",
-                "current_semester",
-            ],
+            f, fieldnames=["student_id", "faculty_id", "department_id", "current_semester"]
         )
         writer.writeheader()
         writer.writerows(students)
@@ -326,14 +400,11 @@ def generate_dataset() -> None:
         writer.writeheader()
         writer.writerows(enrollments)
 
-    print(
-        f"Generated dataset:\n"
-        f"- {len(timeslots)} timeslots saved to {TIMESLOTS_CSV}\n"
-        f"- {len(courses)} courses saved to {COURSES_CSV}\n"
-        f"- {len(students)} students saved to {STUDENTS_CSV}\n"
-        f"- {len(enrollments)} enrollments saved to {ENROLLMENTS_CSV}"
-    )
-
+    print("Generated dataset:")
+    print(f"- {len(timeslots)} timeslots saved to {TIMESLOTS_CSV}")
+    print(f"- {len(courses)} courses saved to {COURSES_CSV}")
+    print(f"- {len(students)} students saved to {STUDENTS_CSV}")
+    print(f"- {len(enrollments)} enrollments saved to {ENROLLMENTS_CSV}")
 
 if __name__ == "__main__":
     generate_dataset()
