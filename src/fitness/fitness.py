@@ -3,6 +3,7 @@ from collections import Counter, defaultdict
 from src.fitness.hard_constraints import count_hard_constraint_violations
 from src.fitness.soft_constraints import (
     calculate_consecutive_and_too_many,
+    calculate_friday_afternoon_penalty,
     calculate_high_enrollment_separation,
     calculate_same_semester_separation,
     calculate_spread_penalty,
@@ -15,6 +16,7 @@ from src.models.timeslot import Timeslot
 from src.utils.constants import (
     HIGH_ENROLLMENT_THRESHOLD,
     WEIGHT_CONSECUTIVE_EXAMS,
+    WEIGHT_FRIDAY_AFTERNOON_PENALTY,
     WEIGHT_HARD_CONSTRAINT,
     WEIGHT_HIGH_ENROLLMENT_SEPARATION,
     WEIGHT_PREFERRED_GAP,
@@ -104,8 +106,8 @@ def initialize_fitness_data(
 
 def calculate_fitness(
     chromosome: Chromosome,
-    conflict_matrix: ConflictMatrix,
-    timeslots: list[int],
+    conflict_matrix: ConflictMatrix | None = None,
+    timeslots: list[int] | None = None,
 ) -> float:
     """Calculate the fitness of a chromosome.
 
@@ -113,8 +115,8 @@ def calculate_fitness(
 
     Args:
         chromosome: Candidate solution (list of timeslots assigned to each course).
-        conflict_matrix: Adjacency list of course conflicts.
-        timeslots: List of available timeslot IDs.
+        conflict_matrix: Adjacency list of course conflicts (unused).
+        timeslots: List of available timeslot IDs (unused).
 
     Returns:
         float: The calculated total penalty.
@@ -139,6 +141,10 @@ def calculate_fitness(
         chromosome, _course_indices, _timeslot_map, _high_enrollment_courses
     )
 
+    friday_afternoon_val = calculate_friday_afternoon_penalty(
+        chromosome, _timeslot_map
+    )
+
     # 3. Sum penalties weighted
     total_penalty = (
         hc_violations * WEIGHT_HARD_CONSTRAINT
@@ -148,6 +154,7 @@ def calculate_fitness(
         + same_sem_val * WEIGHT_SAME_SEMESTER_SEPARATION
         + high_enroll_val * WEIGHT_HIGH_ENROLLMENT_SEPARATION
         + pref_gap_val * WEIGHT_PREFERRED_GAP
+        + friday_afternoon_val * WEIGHT_FRIDAY_AFTERNOON_PENALTY
     )
 
     return total_penalty
@@ -155,8 +162,8 @@ def calculate_fitness(
 
 def calculate_penalty(
     chromosome: Chromosome,
-    conflict_matrix: ConflictMatrix,
-    timeslots: list[int],
+    conflict_matrix: ConflictMatrix | None = None,
+    timeslots: list[int] | None = None,
 ) -> float:
     """Alias for calculate_fitness.
 
@@ -191,6 +198,9 @@ def evaluate_constraints(chromosome: Chromosome) -> dict[str, float | int]:
     high_enroll = calculate_high_enrollment_separation(
         chromosome, _course_indices, _timeslot_map, _high_enrollment_courses
     )
+    friday_afternoon = calculate_friday_afternoon_penalty(
+        chromosome, _timeslot_map
+    )
 
     return {
         "hard_constraint_violations": hc,
@@ -200,6 +210,7 @@ def evaluate_constraints(chromosome: Chromosome) -> dict[str, float | int]:
         "spread_penalty": spread,
         "same_semester_violations": same_sem,
         "high_enrollment_violations": high_enroll,
+        "friday_afternoon_violations": friday_afternoon,
         "total_penalty": (
             hc * WEIGHT_HARD_CONSTRAINT
             + consecutive * WEIGHT_CONSECUTIVE_EXAMS
@@ -208,5 +219,6 @@ def evaluate_constraints(chromosome: Chromosome) -> dict[str, float | int]:
             + same_sem * WEIGHT_SAME_SEMESTER_SEPARATION
             + high_enroll * WEIGHT_HIGH_ENROLLMENT_SEPARATION
             + pref_gap * WEIGHT_PREFERRED_GAP
+            + friday_afternoon * WEIGHT_FRIDAY_AFTERNOON_PENALTY
         ),
     }

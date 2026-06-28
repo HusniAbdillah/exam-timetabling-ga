@@ -29,6 +29,7 @@ def setup_fitness_data():
         Timeslot(3, 1, 3),  # Day 1 Session 3
         Timeslot(4, 2, 1),  # Day 2 Session 1
         Timeslot(5, 2, 2),  # Day 2 Session 2
+        Timeslot(6, 5, 3),  # Day 5 Session 3 (Friday Afternoon)
     ]
 
     students = [
@@ -72,11 +73,12 @@ def test_hard_constraint_violation():
 
 
 def test_consecutive_exams_violation():
-    # S1 takes GEN101 (slot 1) and KOM201 (slot 2). Adjacency causes violation.
+    # S1 takes GEN101 (slot 1) and KOM201 (slot 2). Adjacency causes consecutive violation.
+    # S2 takes GEN101 (slot 1) and STT201 (slot 3). Gap causes preferred gap violation.
     chromosome = [1, 4, 2, 5, 3]
     stats = evaluate_constraints(chromosome)
     assert stats["consecutive_exams_violations"] >= 1
-    assert stats["preferred_gap_violations"] >= 1
+    assert stats["preferred_gap_violations"] == 1
 
 
 def test_same_semester_core_separation_violation():
@@ -122,3 +124,24 @@ def test_greedy_baseline():
 
     assert len(result.best_solution) == len(courses)
     assert result.best_fitness >= 0
+
+
+def test_preferred_gap_violation():
+    # S1 takes GEN101 (slot 1) and KOM201 (slot 3). Gap session 2 is empty.
+    # KOM202 is placed in slot 4 (Day 2) so S1 only has sessions 1 and 3 on Day 1.
+    # This should trigger preferred gap violation, but NOT consecutive exams.
+    chromosome = [1, 4, 3, 4, 4]
+    stats = evaluate_constraints(chromosome)
+    assert stats["preferred_gap_violations"] >= 1
+    assert stats["consecutive_exams_violations"] == 0
+
+
+def test_friday_afternoon_penalty():
+    # Map GEN101 to slot 6 (Friday Session 3)
+    # This should trigger Friday afternoon penalty.
+    chromosome = [6, 4, 5, 3, 4]
+    stats = evaluate_constraints(chromosome)
+    assert stats["friday_afternoon_violations"] == 1
+    # Check that total penalty includes Friday Afternoon weight (5.0)
+    assert stats["total_penalty"] >= 5.0
+

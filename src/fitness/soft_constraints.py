@@ -48,16 +48,18 @@ def calculate_consecutive_and_too_many(
             if len(sessions) > 2:
                 too_many += 1
 
-            # 2. Consecutive Exams & Preferred Gap
-            if len(sessions) < 2:
-                continue
+            # 2. Consecutive Exams
+            if len(sessions) >= 2:
+                # Sort sessions to check adjacency
+                sorted_sessions = sorted(sessions)
+                for i in range(len(sorted_sessions) - 1):
+                    if sorted_sessions[i + 1] - sorted_sessions[i] == 1:
+                        consecutive += 1
 
-            # Sort sessions to check adjacency
-            sorted_sessions = sorted(sessions)
-            for i in range(len(sorted_sessions) - 1):
-                if sorted_sessions[i + 1] - sorted_sessions[i] == 1:
-                    consecutive += 1
-                    pref_gap += 1
+            # 3. Preferred Gap (SIMAK IPB Style: Session 1 and 3 scheduled, but not Session 2)
+            sessions_set = set(sessions)
+            if 1 in sessions_set and 3 in sessions_set and 2 not in sessions_set:
+                pref_gap += 1
 
     return consecutive, too_many, pref_gap
 
@@ -172,3 +174,29 @@ def calculate_high_enrollment_separation(
             violations += count * (count - 1) // 2
 
     return violations
+
+
+def calculate_friday_afternoon_penalty(
+    chromosome: Chromosome,
+    timeslot_map: dict[int, tuple[int, int]],
+) -> int:
+    """Calculate Friday afternoon penalty.
+
+    A penalty is added for each exam scheduled on Friday (day 5)
+    in Session 3 (afternoon).
+
+    Args:
+        chromosome: Candidate solution mapping course index to slot ID.
+        timeslot_map: Mapping from slot ID to (day, session).
+
+    Returns:
+        Total Friday afternoon penalty violations.
+    """
+    violations = 0
+    for slot_id in chromosome:
+        if slot_id in timeslot_map:
+            day, session = timeslot_map[slot_id]
+            if day == 5 and session == 3:
+                violations += 1
+    return violations
+
