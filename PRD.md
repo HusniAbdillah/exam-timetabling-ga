@@ -36,20 +36,19 @@ Proyek ini bertujuan untuk:
 * Simulasi universitas multijurusan.
 * Pembacaan dataset dari file CSV.
 * Pembentukan conflict matrix.
-* Implementasi Genetic Algorithm.
-* Evaluasi fitness.
-* Visualisasi hasil.
+* Implementasi Genetic Algorithm (Pure GA dan Hybrid GA dengan memetic repair mechanism).
+* Alokasi ruang ujian statis dan evaluasi kapasitas ruangan.
+* Evaluasi fitness dengan batasan tambahan (max exams per day, slot blocks).
+* Visualisasi hasil dan perbandingan performa.
 * Perbandingan dengan algoritma Greedy.
 
 ## Out of Scope
 
-* Penjadwalan ruang ujian.
-* Penjadwalan pengawas.
-* Kapasitas ruang.
-* Sistem informasi akademik.
-* Basis data.
+* Penjadwalan pengawas ujian.
+* Sistem informasi akademik dinamis.
+* Basis data relasional (SQL/NoSQL).
 * REST API.
-* Multi-objective optimization.
+* Multi-objective optimization (non-dominated sorting).
 
 ---
 
@@ -59,11 +58,12 @@ Universitas yang disimulasikan memiliki karakteristik sebagai berikut.
 
 | Komponen                    |  Nilai |
 | --------------------------- | -----: |
-| Fakultas                    |     ±5 |
-| Program Studi               |    ±10 |
-| Mahasiswa per Program Studi |   ±130 |
-| Mata Kuliah                 | ±40–60 |
-| Slot Ujian                  |    ±15 |
+| Fakultas                    |     5  |
+| Program Studi               |    10  |
+| Mahasiswa per Program Studi |   ~130 |
+| Mata Kuliah                 | 120-150|
+| Slot Ujian                  |     10 |
+| Ruang Ujian                 |     10 |
 
 Jenis mata kuliah terdiri atas:
 
@@ -77,7 +77,7 @@ Conflict antar ujian terbentuk berdasarkan mahasiswa yang mengambil lebih dari s
 
 # 5. Permasalahan
 
-Masalah utama yang diselesaikan adalah menentukan slot ujian untuk setiap mata kuliah sehingga konflik mahasiswa dapat diminimalkan.
+Masalah utama yang diselesaikan adalah menentukan slot ujian untuk setiap mata kuliah sehingga konflik mahasiswa dapat diminimalkan, tanpa melanggar batasan kapasitas ruangan dan jadwal blokir fakultas.
 
 Representasi solusi:
 
@@ -102,26 +102,26 @@ Contoh:
 Hard Constraint wajib dipenuhi.
 
 * Mahasiswa tidak boleh memiliki dua ujian pada slot yang sama.
+* Jam ujian tidak boleh melanggar batasan slot blokir fakultas (`slot_blocks.csv`).
+* Kapasitas ruang ujian tidak boleh terlampaui oleh jumlah mahasiswa terdaftar dalam slot yang sama (`rooms.csv`).
+* Mahasiswa tidak boleh menempuh ujian melebihi batas harian (`max_exams_per_day`).
 
 ## Soft Constraint
 
 Soft Constraint digunakan untuk meningkatkan kualitas jadwal.
 
-* Mengurangi ujian berturut-turut.
+* Mengurangi ujian berturut-turut pada sesi yang berdekatan.
 * Mengurangi jumlah ujian dalam satu hari.
-* Menyebarkan ujian secara lebih merata pada seluruh slot.
+* Menyebarkan ujian secara lebih merata pada seluruh slot (Spread Penalty).
+* Memisahkan ujian mata kuliah wajib semester/jurusan yang sama agar tidak terlalu dekat.
+* Memisahkan mata kuliah dengan jumlah peserta tinggi (High Enrollment).
+* J jeda sesi yang ideal (Preferred Gap).
 
 ## Rumus Evaluasi Penalti
 
 Optimasi dilakukan dengan meminimalkan total penalti (*lower penalty is better*). Rumus perhitungan penalti didefinisikan sebagai:
 
-$$\text{penalty} = 1000 \times \text{Hard Constraint} + 10 \times \text{Consecutive Exams} + 5 \times \text{Too Many Exams Per Day} + 2 \times \text{Spread Penalty}$$
-
-Di mana:
-* **Hard Constraint**: Jumlah mahasiswa yang memiliki jadwal ujian bentrok (pada slot yang sama).
-* **Consecutive Exams**: Jumlah kejadian mahasiswa memiliki ujian berurutan/berturut-turut pada hari yang sama.
-* **Too Many Exams Per Day**: Jumlah kejadian mahasiswa memiliki lebih dari dua ujian dalam satu hari.
-* **Spread Penalty**: Penalti penyebaran ujian untuk mengukur ketidakmerataan distribusi ujian pada slot waktu yang tersedia.
+$$\text{penalty} = 1000 \times \text{Hard Constraint} + 10 \times \text{Consecutive Exams} + 5 \times \text{Too Many Exams Per Day} + 30 \times \text{Spread Penalty} + 3 \times \text{Same Semester Core Separation} + 2 \times \text{High Enrollment Exam Separation} + 1 \times \text{Preferred Gap} + 200 \times \text{Max Exams Per Day Violations} + 300 \times \text{Room Capacity Violations} + 250 \times \text{Slot Block Violations}$$
 
 ---
 
@@ -135,6 +135,8 @@ Dataset disimpan dalam bentuk CSV.
 | courses.csv    | Data mata kuliah                 |
 | enrollment.csv | Relasi mahasiswa dan mata kuliah |
 | timeslots.csv  | Slot ujian                       |
+| rooms.csv      | Data kapasitas ruangan           |
+| slot_blocks.csv| Data pemblokiran sesi fakultas   |
 
 Seluruh dataset dibaca dari direktori `data/`.
 

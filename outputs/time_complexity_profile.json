@@ -1,26 +1,50 @@
 {
   "greedy": {
-    "execution_time_seconds": 6.515135399997234,
-    "fitness": 5072.0
+    "execution_time_seconds": 11.75,
+    "fitness": 1218831.5
   },
-  "ga_scaling": [
+  "pure_ga": [
+    {
+      "generations": 5,
+      "execution_time_seconds": 2.75,
+      "fitness": 1822557.5
+    },
     {
       "generations": 10,
-      "population_size": 50,
-      "execution_time_seconds": 1.9447266999923158,
-      "fitness": 338782.0
+      "execution_time_seconds": 5.4060000000026776,
+      "fitness": 1589388.5
     },
     {
-      "generations": 50,
-      "population_size": 50,
-      "execution_time_seconds": 13.3757811000105,
-      "fitness": 129445.4
+      "generations": 20,
+      "execution_time_seconds": 10.453000000008615,
+      "fitness": 1352388.5
     },
     {
-      "generations": 100,
-      "population_size": 50,
-      "execution_time_seconds": 22.370288200007053,
-      "fitness": 21817.0
+      "generations": 40,
+      "execution_time_seconds": 17.562999999994645,
+      "fitness": 1226253.5
+    }
+  ],
+  "hybrid_ga": [
+    {
+      "generations": 5,
+      "execution_time_seconds": 2.610000000000582,
+      "fitness": 1189555.5
+    },
+    {
+      "generations": 10,
+      "execution_time_seconds": 4.8439999999973224,
+      "fitness": 1104482.5
+    },
+    {
+      "generations": 20,
+      "execution_time_seconds": 9.264999999999418,
+      "fitness": 1103486.5
+    },
+    {
+      "generations": 40,
+      "execution_time_seconds": 21.656000000002678,
+      "fitness": 1073684.5
     }
   ]
 }

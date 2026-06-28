@@ -7,6 +7,8 @@ from src.fitness.fitness import (
     calculate_fitness,
     evaluate_constraints,
     initialize_fitness_data,
+    set_blocked_slots,
+    set_room_data,
 )
 from src.ga.engine import GAConfig, run_ga
 from src.preprocessing.conflict_matrix import build_conflict_matrix
@@ -34,7 +36,12 @@ def run_benchmark(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. Load and validate data
-    students, courses, enrollments, timeslots = load_dataset(DATA_DIR)
+    students, courses, enrollments, timeslots, rooms, slot_blocks = load_dataset(
+        DATA_DIR
+    )
+    # Register additional data for fitness calculations
+    set_room_data(rooms, {c.course_id: c.room_id for c in courses if c.room_id})
+    set_blocked_slots(slot_blocks)
     validate_dataset(students, courses, enrollments, timeslots)
 
     # 2. Build conflict matrix
@@ -47,16 +54,7 @@ def run_benchmark(
     # Initialize fitness registry
     initialize_fitness_data(students, courses, enrollments, timeslots)
 
-    # 3. Run Genetic Algorithm
-    ga_result = run_ga(
-        course_ids,
-        slot_ids,
-        conflict_matrix,
-        ga_config,
-        calculate_fitness,
-    )
-
-    # 4. Run Greedy Baseline
+    # 3. Run Greedy Baseline
     greedy_result = run_greedy(
         students,
         courses,
@@ -65,17 +63,43 @@ def run_benchmark(
         conflict_matrix,
     )
 
-    # 5. Evaluate final constraint statistics
-    ga_stats = evaluate_constraints(ga_result.best_solution)
+    # 4. Run Pure Genetic Algorithm (no seed)
+    pure_ga_result = run_ga(
+        course_ids,
+        slot_ids,
+        conflict_matrix,
+        ga_config,
+        calculate_fitness,
+        seeds=None,
+    )
+
+    # 5. Run Hybrid Genetic Algorithm (seeded with Greedy solution and with Repair enabled)
+    import copy
+
+    hybrid_config = copy.deepcopy(ga_config)
+    hybrid_config.enable_repair = True
+
+    hybrid_ga_result = run_ga(
+        course_ids,
+        slot_ids,
+        conflict_matrix,
+        hybrid_config,
+        calculate_fitness,
+        seeds=[greedy_result.best_solution],
+    )
+
+    # 6. Evaluate final constraint statistics
+    pure_ga_stats = evaluate_constraints(pure_ga_result.best_solution)
     greedy_stats = evaluate_constraints(greedy_result.best_solution)
+    hybrid_ga_stats = evaluate_constraints(hybrid_ga_result.best_solution)
 
     # Map timeslot ID for reporting
     timeslot_map = {t.slot_id: t for t in timeslots}
 
-    # 6. Save outputs/schedule.csv (based on GA best solution)
+    # 7. Save outputs/schedule.csv (based on Hybrid GA best solution)
     schedule_rows = []
     for idx, course in enumerate(courses):
-        assigned_slot_id = ga_result.best_solution[idx]
+        assigned_slot_id = hybrid_ga_result.best_solution[idx]
         ts = timeslot_map.get(assigned_slot_id)
         day = ts.day if ts else 1
         session = ts.session if ts else 1
@@ -105,23 +129,38 @@ def run_benchmark(
         writer.writeheader()
         writer.writerows(schedule_rows)
 
-    # 7. Save outputs/fitness_history.csv
+    # 8. Save outputs/fitness_history.csv (Pure GA vs Hybrid GA)
     history_file = output_dir / "fitness_history.csv"
     with open(history_file, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["generation", "best_fitness"])
-        for gen_idx, fitness_val in enumerate(ga_result.fitness_history):
-            writer.writerow([gen_idx, fitness_val])
+        writer.writerow(["generation", "pure_ga_fitness", "hybrid_ga_fitness"])
+        max_len = max(
+            len(pure_ga_result.fitness_history), len(hybrid_ga_result.fitness_history)
+        )
+        for gen_idx in range(max_len):
+            p_val = (
+                pure_ga_result.fitness_history[gen_idx]
+                if gen_idx < len(pure_ga_result.fitness_history)
+                else pure_ga_result.best_fitness
+            )
+            h_val = (
+                hybrid_ga_result.fitness_history[gen_idx]
+                if gen_idx < len(hybrid_ga_result.fitness_history)
+                else hybrid_ga_result.best_fitness
+            )
+            writer.writerow([gen_idx, p_val, h_val])
 
-    # 8. Save outputs/statistics.json
+    # 9. Save outputs/statistics.json (Pure GA, Greedy, Hybrid GA)
     stats_data = {
-        "ga": {
-            "execution_time_seconds": ga_result.execution_time,
-            "best_fitness": ga_result.best_fitness,
-            "hard_constraint_violations": ga_stats["hard_constraint_violations"],
-            "consecutive_exams_violations": ga_stats["consecutive_exams_violations"],
-            "too_many_exams_violations": ga_stats["too_many_exams_violations"],
-            "spread_penalty": ga_stats["spread_penalty"],
+        "pure_ga": {
+            "execution_time_seconds": pure_ga_result.execution_time,
+            "best_fitness": pure_ga_result.best_fitness,
+            "hard_constraint_violations": pure_ga_stats["hard_constraint_violations"],
+            "consecutive_exams_violations": pure_ga_stats[
+                "consecutive_exams_violations"
+            ],
+            "too_many_exams_violations": pure_ga_stats["too_many_exams_violations"],
+            "spread_penalty": pure_ga_stats["spread_penalty"],
         },
         "greedy": {
             "execution_time_seconds": greedy_result.execution_time,
@@ -132,6 +171,16 @@ def run_benchmark(
             ],
             "too_many_exams_violations": greedy_stats["too_many_exams_violations"],
             "spread_penalty": greedy_stats["spread_penalty"],
+        },
+        "hybrid_ga": {
+            "execution_time_seconds": hybrid_ga_result.execution_time,
+            "best_fitness": hybrid_ga_result.best_fitness,
+            "hard_constraint_violations": hybrid_ga_stats["hard_constraint_violations"],
+            "consecutive_exams_violations": hybrid_ga_stats[
+                "consecutive_exams_violations"
+            ],
+            "too_many_exams_violations": hybrid_ga_stats["too_many_exams_violations"],
+            "spread_penalty": hybrid_ga_stats["spread_penalty"],
         },
     }
 

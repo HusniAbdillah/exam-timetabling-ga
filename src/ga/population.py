@@ -1,28 +1,32 @@
-from src.ga.chromosome import Population, create_random_chromosome
+from src.ga.chromosome import Chromosome, Population, create_random_chromosome
 
 
 def initialize_population(
     num_courses: int,
     num_timeslots: int,
     population_size: int,
+    seeds: list[Chromosome] | None = None,
 ) -> Population:
-    """Create an initial population of randomly generated chromosomes.
+    """Create an initial population of chromosomes, optionally starting with seed individuals.
 
-    Each chromosome is independently randomized, giving the GA a diverse
-    starting point to explore the search space.
+    Each chromosome is independently randomized, unless pre-seeded.
 
     Args:
         num_courses: Number of courses to schedule (chromosome length).
         num_timeslots: Number of available timeslot IDs (slots are 1-indexed).
         population_size: Number of individuals in the population.
+        seeds: Optional list of pre-configured chromosomes to seed the population.
 
     Returns:
-        A list of ``population_size`` randomly initialized chromosomes.
+        A list of ``population_size`` chromosomes.
     """
-    return [
-        create_random_chromosome(num_courses, num_timeslots)
-        for _ in range(population_size)
-    ]
+    pop = []
+    if seeds:
+        for s in seeds:
+            pop.append(s[:])
+    while len(pop) < population_size:
+        pop.append(create_random_chromosome(num_courses, num_timeslots))
+    return pop
 
 
 def get_population_stats(

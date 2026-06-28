@@ -21,7 +21,7 @@ def _load_stats(stats_or_path: dict | Path | str) -> dict:
 
 def plot_fitness_comparison(stats_or_path: dict | Path | str) -> go.Figure:
     """Membuat diagram batang perbandingan nilai fitness akhir (Total Penalti)
-    GA vs Greedy.
+    Pure GA vs Greedy vs Hybrid GA.
 
     Args:
         stats_or_path: Objek dictionary statistik atau path menuju file JSON.
@@ -30,16 +30,24 @@ def plot_fitness_comparison(stats_or_path: dict | Path | str) -> go.Figure:
         go.Figure: Objek grafik Plotly.
     """
     stats = _load_stats(stats_or_path)
-    algorithms = ["Genetic Algorithm", "Greedy Baseline"]
-    fitness_values = [stats["ga"]["best_fitness"], stats["greedy"]["best_fitness"]]
+    algorithms = ["Pure GA", "Greedy Baseline", "Hybrid GA (Greedy + GA)"]
+    fitness_values = [
+        stats["pure_ga"]["best_fitness"],
+        stats["greedy"]["best_fitness"],
+        stats["hybrid_ga"]["best_fitness"],
+    ]
 
     fig = go.Figure(
         data=[
             go.Bar(
                 x=algorithms,
                 y=fitness_values,
-                marker_color=["#4f46e5", "#64748b"],  # Indigo vs Slate Gray
-                text=fitness_values,
+                marker_color=[
+                    "#0ea5e9",
+                    "#64748b",
+                    "#4f46e5",
+                ],  # Sky Blue, Slate Gray, Indigo
+                text=[f"{val:.2f}" for val in fitness_values],
                 textposition="auto",
                 hovertemplate="Algoritma: %{x}<br>Total Penalti: %{y}<extra></extra>",
             )
@@ -59,7 +67,7 @@ def plot_fitness_comparison(stats_or_path: dict | Path | str) -> go.Figure:
 
 def plot_violations_comparison(stats_or_path: dict | Path | str) -> go.Figure:
     """Membuat diagram batang perbandingan pelanggaran constraint &
-    penalti detail GA vs Greedy.
+    penalti detail Pure GA vs Greedy vs Hybrid GA.
 
     Args:
         stats_or_path: Objek dictionary statistik atau path menuju file JSON.
@@ -75,11 +83,11 @@ def plot_violations_comparison(stats_or_path: dict | Path | str) -> go.Figure:
         "Spread Penalty",
     ]
 
-    ga_vals = [
-        stats["ga"]["hard_constraint_violations"],
-        stats["ga"]["consecutive_exams_violations"],
-        stats["ga"]["too_many_exams_violations"],
-        stats["ga"]["spread_penalty"],
+    pure_ga_vals = [
+        stats["pure_ga"]["hard_constraint_violations"],
+        stats["pure_ga"]["consecutive_exams_violations"],
+        stats["pure_ga"]["too_many_exams_violations"],
+        stats["pure_ga"]["spread_penalty"],
     ]
 
     greedy_vals = [
@@ -89,19 +97,32 @@ def plot_violations_comparison(stats_or_path: dict | Path | str) -> go.Figure:
         stats["greedy"]["spread_penalty"],
     ]
 
+    hybrid_ga_vals = [
+        stats["hybrid_ga"]["hard_constraint_violations"],
+        stats["hybrid_ga"]["consecutive_exams_violations"],
+        stats["hybrid_ga"]["too_many_exams_violations"],
+        stats["hybrid_ga"]["spread_penalty"],
+    ]
+
     fig = go.Figure(
         data=[
             go.Bar(
-                name="Genetic Algorithm",
+                name="Pure GA",
                 x=categories,
-                y=ga_vals,
-                marker_color="#4f46e5",
+                y=pure_ga_vals,
+                marker_color="#0ea5e9",
             ),
             go.Bar(
                 name="Greedy Baseline",
                 x=categories,
                 y=greedy_vals,
                 marker_color="#64748b",
+            ),
+            go.Bar(
+                name="Hybrid GA (Greedy + GA)",
+                x=categories,
+                y=hybrid_ga_vals,
+                marker_color="#4f46e5",
             ),
         ]
     )

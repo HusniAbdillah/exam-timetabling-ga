@@ -44,8 +44,16 @@ def test_load_and_validate_dataset(temp_csv_dir):
     with open(temp_csv_dir / "timeslots.csv", "w", encoding="utf-8") as f:
         f.write(timeslots_data)
 
-    # Test load
-    students, courses, enrollments, timeslots = load_dataset(temp_csv_dir)
+    # Create empty placeholder CSVs for rooms and slot_blocks
+    with open(temp_csv_dir / "rooms.csv", "w", encoding="utf-8") as f:
+        f.write("room_id,capacity\n")
+    with open(temp_csv_dir / "slot_blocks.csv", "w", encoding="utf-8") as f:
+        f.write("faculty_id,day,session\n")
+
+    # Test load with new signature
+    students, courses, enrollments, timeslots, rooms, slot_blocks = load_dataset(
+        temp_csv_dir
+    )
 
     assert len(students) == 2
     assert students[0].student_id == "S1"

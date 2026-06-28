@@ -21,3 +21,4 @@ class Course:
     department_id: str
     offered_semester: int
     course_type: str
+    room_id: str = ""

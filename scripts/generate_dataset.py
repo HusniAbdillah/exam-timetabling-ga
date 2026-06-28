@@ -1,12 +1,15 @@
 import csv
 import random
-from pathlib import Path
+from collections import Counter
+
 from src.utils.constants import (
     COURSES_CSV,
     ENROLLMENTS_CSV,
     FACULTY_DEPARTMENTS,
     GENERAL_DEPARTMENT,
     GENERAL_FACULTY,
+    ROOMS_CSV,
+    SLOT_BLOCKS_CSV,
     STUDENTS_CSV,
     TIMESLOTS_CSV,
 )
@@ -20,7 +23,7 @@ def generate_dataset() -> None:
     - 8 semesters of students, with ~130 students per department (total ~1300).
     - A multi-layered course structure (General, Faculty, Department, Electives).
     - Extremely high-density conflicts: Students take 6-7 courses per semester.
-    - 10 available exam timeslots (5 days, 2 sessions per day).
+    - Exactly 10 available exam timeslots (5 days, 2 sessions per day).
     """
     random.seed(42)  # For reproducibility
 
@@ -33,7 +36,7 @@ def generate_dataset() -> None:
     timeslots = []
     slot_id = 1
     for day in range(1, 6):  # 5 days
-        for session in range(1, 3):  # 2 sessions per day (Pagi & Siang)
+        for session in range(1, 3):  # 2 sessions per day
             timeslots.append({"slot_id": slot_id, "day": day, "session": session})
             slot_id += 1
 
@@ -278,21 +281,6 @@ def generate_dataset() -> None:
             }
         )
 
-    with open(COURSES_CSV, mode="w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(
-            f,
-            fieldnames=[
-                "course_id",
-                "course_name",
-                "faculty_id",
-                "department_id",
-                "offered_semester",
-                "course_type",
-            ],
-        )
-        writer.writeheader()
-        writer.writerows(courses)
-
     # ---------------------------------------------------------------------------
     # 3. Generate Students & Enrollments
     # ---------------------------------------------------------------------------
@@ -333,7 +321,7 @@ def generate_dataset() -> None:
 
     for fac, depts in FACULTY_DEPARTMENTS.items():
         for dept in depts:
-            # ~16 students per semester, total ~130 per department
+            # Generate ~16 students per semester, total ~130 per department, total ~1300 overall
             for sem in range(1, 9):
                 num_students_in_sem = 16 if sem != 8 else 18
                 for _ in range(num_students_in_sem):
@@ -364,7 +352,6 @@ def generate_dataset() -> None:
                             enrollments.append({"student_id": sid, "course_id": fcid})
 
                     # 3. Department core courses (taken by semesters 2, 4, 6)
-                    # Students take ALL 4 core courses offered in their semester
                     dept_sem = sem if sem in [2, 4, 6] else None
                     if dept_sem and (dept_sem, dept) in courses_by_sem_and_dept:
                         for cid in courses_by_sem_and_dept[(dept_sem, dept)]:
@@ -372,15 +359,13 @@ def generate_dataset() -> None:
 
                     # 4. Elective courses (taken by senior semesters 5-8)
                     if sem in [5, 6, 7, 8] and dept in elective_ids_by_dept:
-                        # Senior students enroll in all electives of their department
                         for ecid in elective_ids_by_dept[dept]:
                             enrollments.append({"student_id": sid, "course_id": ecid})
 
-                    # 5. Repeating Students (30% chance for semesters 3, 5, 7)
-                    if sem in [3, 5, 7] and random.random() < 0.30:
+                    # 5. Repeating Students (60% chance for semesters 3, 5, 7) - High conflict density
+                    if sem in [3, 5, 7] and random.random() < 0.6:
                         lower_sem = sem - 1
                         if (lower_sem, dept) in courses_by_sem_and_dept:
-                            # Enroll in 2 random core courses from the lower semester
                             repeats = random.sample(
                                 courses_by_sem_and_dept[(lower_sem, dept)], k=2
                             )
@@ -389,13 +374,100 @@ def generate_dataset() -> None:
                                     {"student_id": sid, "course_id": rcid}
                                 )
 
-                    # 6. Cross-Department Enrollments (30% chance)
-                    # Links departments together globally
-                    if dept == "ILKOM" and sem == 4 and random.random() < 0.30:
+                    # 6. Cross-Department Enrollments (60% chance) - Interdependent global graph
+                    if dept == "ILKOM" and sem == 4 and random.random() < 0.6:
                         enrollments.append({"student_id": sid, "course_id": "STT201"})
-                    elif dept == "STAT" and sem == 4 and random.random() < 0.30:
+                    elif dept == "STAT" and sem == 4 and random.random() < 0.6:
                         enrollments.append({"student_id": sid, "course_id": "KOM401"})
 
+    # ---------------------------------------------------------------------------
+    # 4. Count Course Enrollments and Allocate Rooms
+    # ---------------------------------------------------------------------------
+    course_enrollment_counts = Counter(e["course_id"] for e in enrollments)
+
+    # Fixed rooms as requested by user
+    # 2 Large (300), 3 Medium (150), 5 Small (80)
+    rooms = [
+        {"room_id": "R001", "capacity": 300},
+        {"room_id": "R002", "capacity": 300},
+        {"room_id": "R003", "capacity": 150},
+        {"room_id": "R004", "capacity": 150},
+        {"room_id": "R005", "capacity": 150},
+        {"room_id": "R006", "capacity": 80},
+        {"room_id": "R007", "capacity": 80},
+        {"room_id": "R008", "capacity": 80},
+        {"room_id": "R009", "capacity": 80},
+        {"room_id": "R010", "capacity": 80},
+    ]
+
+    with open(ROOMS_CSV, mode="w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["room_id", "capacity"])
+        writer.writeheader()
+        writer.writerows(rooms)
+
+    # Assign room to each course based on enrollment
+    # Alternate assignments for load balancing
+    large_index = 0
+    medium_index = 0
+    small_index = 0
+
+    large_rooms = ["R001", "R002"]
+    medium_rooms = ["R003", "R004", "R005"]
+    small_rooms = ["R006", "R007", "R008", "R009", "R010"]
+
+    for course in courses:
+        cid = course["course_id"]
+        enrollment_count = course_enrollment_counts.get(cid, 0)
+
+        if enrollment_count > 150:
+            course["room_id"] = large_rooms[large_index % len(large_rooms)]
+            large_index += 1
+        elif enrollment_count > 80:
+            course["room_id"] = medium_rooms[medium_index % len(medium_rooms)]
+            medium_index += 1
+        else:
+            course["room_id"] = small_rooms[small_index % len(small_rooms)]
+            small_index += 1
+
+    # Write courses CSV
+    with open(COURSES_CSV, mode="w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=[
+                "course_id",
+                "course_name",
+                "faculty_id",
+                "department_id",
+                "offered_semester",
+                "course_type",
+                "room_id",
+            ],
+        )
+        writer.writeheader()
+        writer.writerows(courses)
+
+    # ---------------------------------------------------------------------------
+    # 5. Generate Slot Blocks
+    # ---------------------------------------------------------------------------
+    # Prohibit FMIPA, FATETA, and FEM from scheduling during key timeslots
+    # (e.g., Friday Afternoon and major blocks on Day 1/2) to squeeze Greedy algorithm
+    slot_blocks = [
+        {"faculty_id": "FMIPA", "day": 1, "session": 1},
+        {"faculty_id": "FMIPA", "day": 1, "session": 2},
+        {"faculty_id": "FATETA", "day": 2, "session": 1},
+        {"faculty_id": "FATETA", "day": 2, "session": 2},
+        {"faculty_id": "FEM", "day": 3, "session": 1},
+        {"faculty_id": "FEM", "day": 3, "session": 2},
+    ]
+
+    with open(SLOT_BLOCKS_CSV, mode="w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["faculty_id", "day", "session"])
+        writer.writeheader()
+        writer.writerows(slot_blocks)
+
+    # ---------------------------------------------------------------------------
+    # 6. Write Students and Enrollments CSVs
+    # ---------------------------------------------------------------------------
     with open(STUDENTS_CSV, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
             f,
@@ -419,6 +491,8 @@ def generate_dataset() -> None:
     print(f"- {len(courses)} courses saved to {COURSES_CSV}")
     print(f"- {len(students)} students saved to {STUDENTS_CSV}")
     print(f"- {len(enrollments)} enrollments saved to {ENROLLMENTS_CSV}")
+    print(f"- {len(rooms)} rooms saved to {ROOMS_CSV}")
+    print(f"- {len(slot_blocks)} slot blocks saved to {SLOT_BLOCKS_CSV}")
 
 
 if __name__ == "__main__":

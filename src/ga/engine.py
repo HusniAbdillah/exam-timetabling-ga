@@ -63,6 +63,7 @@ class GAConfig:
     mutation_rate: float = 0.1
     tournament_size: int = 5
     elite_count: int = 2
+    enable_repair: bool = False
 
 
 # ---------------------------------------------------------------------------
@@ -101,12 +102,13 @@ def run_ga(
     conflict_matrix: ConflictMatrix,
     config: GAConfig,
     fitness_fn: FitnessFn,
+    seeds: list[Chromosome] | None = None,
 ) -> GAResult:
     """Run the Genetic Algorithm to produce an optimized exam timetable.
 
     The algorithm follows a standard generational GA loop:
 
-    1. Initialise a random population.
+    1. Initialise a population (optionally seeded).
     2. Evaluate fitness for every individual.
     3. Preserve elite individuals unchanged.
     4. Fill the rest of the next generation by selecting parents via
@@ -129,6 +131,7 @@ def run_ga(
         config: GA hyperparameters.
         fitness_fn: Callable that computes the penalty for a given chromosome.
             See :data:`FitnessFn` for the expected signature.
+        seeds: Optional list of pre-configured chromosomes to seed the population.
 
     Returns:
         A :class:`GAResult` containing the best chromosome found, its fitness,
@@ -148,7 +151,7 @@ def run_ga(
     start_time = time.monotonic()
 
     population: Population = initialize_population(
-        num_courses, num_timeslots, config.population_size
+        num_courses, num_timeslots, config.population_size, seeds
     )
 
     fitness_history: FitnessHistory = []
@@ -225,6 +228,15 @@ def run_ga(
                 child1 = move_mutation(child1, num_timeslots, config.mutation_rate)
                 child2 = move_mutation(child2, num_timeslots, config.mutation_rate)
 
+            # Apply greedy repair if enabled (Memetic GA local search probability = 0.2)
+            if config.enable_repair and random.random() < 0.20:
+                child1 = repair_chromosome(
+                    child1, conflict_matrix, timeslots, fitness_fn
+                )
+                child2 = repair_chromosome(
+                    child2, conflict_matrix, timeslots, fitness_fn
+                )
+
             next_population.append(child1)
             if len(next_population) < slots_for_offspring:
                 next_population.append(child2)
@@ -247,3 +259,47 @@ def run_ga(
         generation=generation,
         execution_time=execution_time,
     )
+
+
+def repair_chromosome(
+    chromosome: Chromosome,
+    conflict_matrix: ConflictMatrix,
+    timeslots: list[int],
+    fitness_fn: FitnessFn,
+) -> Chromosome:
+    """Greedy repair mechanism for Hybrid GA.
+
+    It goes through each gene (course) and if reassigning it to another timeslot
+    improves the overall fitness, it keeps the change. This is a simple
+    local search repair to push individuals towards feasibility.
+    """
+    repaired = chromosome[:]
+    # We randomly check some courses to repair to avoid high overhead
+    indices = list(range(len(repaired)))
+    random.shuffle(indices)
+
+    # We only repair courses that might have violations.
+    # To keep it fast, we attempt to repair up to 20% of courses in a single generation.
+    num_to_repair = max(1, len(repaired) // 5)
+    for idx in indices[:num_to_repair]:
+        current_slot = repaired[idx]
+        current_penalty = fitness_fn(repaired, conflict_matrix, timeslots)
+
+        if current_penalty == 0.0:
+            break
+
+        best_slot = current_slot
+        best_penalty = current_penalty
+
+        # Try other slots
+        for slot in timeslots:
+            if slot == current_slot:
+                continue
+            repaired[idx] = slot
+            penalty = fitness_fn(repaired, conflict_matrix, timeslots)
+            if penalty < best_penalty:
+                best_penalty = penalty
+                best_slot = slot
+
+        repaired[idx] = best_slot
+    return repaired
