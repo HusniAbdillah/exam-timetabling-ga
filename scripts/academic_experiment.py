@@ -4,6 +4,7 @@ import math
 import random
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import ScalarFormatter
 
 from src.evaluation.greedy import run_greedy
 from src.fitness.fitness import (
@@ -271,7 +272,6 @@ def run_statistical_significance(
         label=f"Greedy Baseline ({greedy_fit:.1f})",
     )
     plt.yscale("log")
-    from matplotlib.ticker import ScalarFormatter
     plt.gca().yaxis.set_major_formatter(ScalarFormatter())
     plt.title("Signifikansi Statistik (30 Runs) - Kualitas Solusi (Fitness)")
     plt.ylabel("Total Penalti (Skala Log, Lebih Rendah Lebih Baik)")
