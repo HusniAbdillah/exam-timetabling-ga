@@ -1,169 +1,135 @@
 # Exam Timetabling using Genetic Algorithm
 
-Implementasi **Genetic Algorithm (GA)** untuk menyelesaikan permasalahan **University Exam Timetabling Problem (UETP)** sebagai tugas mata kuliah **Pengantar Kecerdasan Komputasional**.
+Implementasi **Genetic Algorithm (GA)** untuk menyelesaikan permasalahan **University Exam Timetabling Problem (UETP)**.
+
+<div align="center">
+  
+  [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+  [![Streamlit](https://img.shields.io/badge/Streamlit-1.35+-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io)
+  [![Plotly](https://img.shields.io/badge/Plotly-5.22+-3F4F75?style=flat-square&logo=plotly&logoColor=white)](https://plotly.com)
+  [![Pandas](https://img.shields.io/badge/Pandas-2.2+-150458?style=flat-square&logo=pandas&logoColor=white)](https://pandas.pydata.org)
+  [![NumPy](https://img.shields.io/badge/NumPy-1.26+-013243?style=flat-square&logo=numpy&logoColor=white)](https://numpy.org)
+  [![Pytest](https://img.shields.io/badge/Pytest-8.2+-0A9EDC?style=flat-square&logo=pytest&logoColor=white)](https://pytest.org)
+  [![Ruff](https://img.shields.io/badge/Ruff-0.4+-ECEFF4?style=flat-square&logo=ruff&logoColor=white)](https://astral.sh/ruff)
+  [![License](https://img.shields.io/badge/Lisensi-MIT-green?style=flat-square)](LICENSE)
+
+  Repositori ini dapat diakses di [github.com/HusniAbdillah/exam-timetabling-ga](https://github.com/HusniAbdillah/exam-timetabling-ga)
+
+  > Dikembangkan untuk memenuhi tugas mata kuliah **Pengantar Kecerdasan Komputasional** - Kelompok 17
+</div>
+
+---
 
 ## Deskripsi
 
-Proyek ini bertujuan membangun sistem optimasi penjadwalan ujian pada sebuah universitas yang terdiri atas beberapa fakultas, program studi, dan mata kuliah. Fokus penelitian adalah menentukan penempatan setiap ujian ke dalam slot waktu sehingga konflik antar mahasiswa dapat diminimalkan.
+Proyek ini membangun sistem optimasi penjadwalan ujian pada sebuah universitas yang terdiri atas beberapa fakultas, program studi, dan mata kuliah. Fokus utama adalah menentukan penempatan setiap ujian ke dalam slot waktu (timeslot) sedemikian rupa sehingga konflik bentrokan jadwal mahasiswa dapat diminimalkan (Hard Constraint) dan kenyamanan penyebaran ujian dapat ditingkatkan (Soft Constraints).
 
-Model yang digunakan merupakan penyederhanaan dari University Exam Timetabling Problem dengan ruang lingkup optimasi hanya pada **penempatan ujian ke slot waktu (Exam → Timeslot)**. Penjadwalan ruang ujian, pengawas, maupun kapasitas ruang tidak termasuk dalam cakupan penelitian agar implementasi tetap berfokus pada Genetic Algorithm.
-
-Dataset yang digunakan merupakan dataset simulasi yang merepresentasikan struktur universitas dengan banyak program studi, mata kuliah umum, dan mata kuliah program studi sehingga menghasilkan conflict graph yang menyerupai kondisi nyata.
+Model yang digunakan membatasi ruang lingkup optimasi pada **penempatan ujian ke slot waktu (Exam -> Timeslot)**. Penjadwalan ruang ujian, pengawas, maupun kapasitas fisik ruangan tidak termasuk dalam cakupan sistem agar implementasi berfokus secara mendalam pada mekanisme evolusi GA.
 
 ---
 
-## Tujuan
-
-* Mengimplementasikan Genetic Algorithm pada permasalahan optimasi penjadwalan ujian.
-* Menghasilkan jadwal ujian dengan jumlah konflik mahasiswa seminimal mungkin.
-* Membandingkan hasil Genetic Algorithm dengan algoritma Greedy sebagai baseline.
-* Menyediakan aplikasi demonstrasi sederhana untuk memvisualisasikan proses optimasi.
-
----
-
-## Ruang Lingkup
-
-### Termasuk
-
-* Simulasi data universitas.
-* Preprocessing dataset.
-* Pembentukan conflict matrix.
-* Implementasi Genetic Algorithm.
-* Evaluasi hasil.
-* Visualisasi jadwal dan perkembangan fitness.
-
-### Tidak Termasuk
-
-* Penjadwalan ruang ujian.
-* Penjadwalan pengawas.
-* Optimasi kapasitas ruang.
-* Sistem informasi akademik.
-* Manajemen pengguna.
-* Database.
-* REST API.
-
----
-
-## Struktur Repository
+## Alur Eksekusi Sistem (Workflow)
 
 ```text
-exam-timetabling-ga
-│
-├── app/
-├── data/
-├── development/
-│   ├── standards/
-│   │   ├── CODING_STANDARD.md
-│   │   ├── DATA_SPEC.md
-│   │   └── TYPE_GUIDELINES.md
-│   ├── GIT_WORKFLOW.md
-│   ├── TEAM_TASKS.md
-│   └── UV_SETUP.md
-├── docs/
-├── outputs/
-├── src/
-│   └── models/
-├── tests/
-│
-├── README.md
-├── PRD.md
-├── ARCHITECTURE.md
-├── CONTRIBUTING.md
-├── pyproject.toml
-└── uv.lock
+1. Sinkronisasi Depedensi (uv sync)
+                │
+                ▼
+2. Generator Dataset (generate_dataset.py) -> Membuat data/
+                │
+                ▼
+3. Unit Testing & Linter (pytest & ruff) -> Opsional
+                │
+                ▼
+4. Menjalankan Dashboard (run.py) -> Streamlit App
+                │
+                ▼
+5. Melakukan Optimasi & Ekspor Hasil -> outputs/
 ```
 
 ---
 
-## Teknologi
+## Panduan Perintah Eksekusi (Command References)
 
-| Komponen            | Teknologi     |
-| ------------------- | ------------- |
-| Bahasa Pemrograman  | Python 3.11+  |
-| Environment Manager | uv            |
-| User Interface      | Streamlit     |
-| Data Processing     | Pandas, NumPy |
-| Visualisasi         | Plotly        |
-| Testing             | pytest        |
-| Linting             | Ruff          |
+Gunakan manajer paket `uv` untuk memastikan konsistensi pustaka yang terpasang di virtual environment.
 
----
-
-## Dataset
-
-Dataset disimpan pada direktori `data/` dan terdiri atas beberapa berkas CSV.
-
-```text
-data/
-├── students.csv
-├── courses.csv
-├── enrollment.csv
-└── timeslots.csv
-```
-
-Seluruh dataset dibaca secara lokal oleh aplikasi. Tidak terdapat mekanisme upload dataset pada antarmuka pengguna.
-
----
-
-## Menjalankan Proyek
-
-### 1. Clone Repository
-
+### 1. Kloning Repository dan Masuk Direktori
 ```bash
-git clone <repository-url>
+git clone https://github.com/HusniAbdillah/exam-timetabling-ga.git
 cd exam-timetabling-ga
 ```
 
-### 2. Sinkronisasi Environment
-
+### 2. Sinkronisasi Dependensi
+Unduh dan pasang semua dependensi secara otomatis ke folder `.venv`:
 ```bash
 uv sync
 ```
 
-### 3. Menjalankan Aplikasi
-
+### 3. Membangkitkan Dataset Simulasi
+Sebelum menjalankan aplikasi, Anda harus membangkitkan data simulasi universitas terlebih dahulu. Data ini meliputi file mahasiswa, kelas, jadwal dasar, dan pendaftaran:
 ```bash
-uv run streamlit run app/app.py
+uv run python scripts/generate_dataset.py
+```
+*Hasil keluaran disimpan di folder `data/` (`students.csv`, `courses.csv`, `enrollment.csv`, `timeslots.csv`).*
+
+### 4. Menjalankan Unit Test
+Verifikasi keselarasan logika mutasi, crossover, conflict matrix, dan perhitungan fitness:
+```bash
+uv run pytest
 ```
 
----
+### 5. Memeriksa Linter dan Formatting
+Format ulang gaya penulisan kode sesuai PEP8 serta cek kesalahan sintaks:
+```bash
+uv run ruff format .
+uv run ruff check .
+```
 
-## Output
+### 6. Menjalankan Dashboard Streamlit
+Gunakan skrip pembuka terpadu yang dapat dihentikan bersih dengan menekan `Ctrl+C`:
+```bash
+uv run python run.py
+```
+*(Alternatif perintah langsung: `uv run streamlit run app/app.py`)*
 
-Aplikasi menghasilkan beberapa keluaran berikut.
-
-* Jadwal ujian terbaik.
-* Nilai fitness terbaik.
-* Grafik perkembangan fitness setiap generasi.
-* Statistik konflik mahasiswa.
-* Perbandingan Genetic Algorithm dan Greedy.
-
-Seluruh hasil eksperimen disimpan pada direktori `outputs/`.
-
----
-
-## Tim Pengembang
-
-| Peran                      | Tanggung Jawab                                   |
-| -------------------------- | ------------------------------------------------ |
-| Project Lead               | Koordinasi proyek, integrasi sistem, dokumentasi |
-| Dataset & Preprocessing    | Dataset, preprocessing, conflict matrix          |
-| Genetic Algorithm          | Implementasi Genetic Algorithm                   |
-| Fitness & Constraint       | Evaluasi fitness dan constraint                  |
-| Evaluation & Visualization | Baseline, evaluasi, visualisasi                  |
+### 7. Menjalankan Eksperimen Akademik
+Untuk menghasilkan data analisis sensitivitas parameter (populasi & mutasi), uji signifikansi statistik (30 runs independen), dan profil kompleksitas waktu secara otomatis:
+```bash
+uv run python scripts/academic_experiment.py
+```
+*Hasil analisis disimpan di folder `outputs/` (`sensitivity_analysis.csv`, `statistical_significance.json`, `time_complexity_profile.json`).*
 
 ---
 
-## Mata Kuliah
+## Panduan Interaksi Antarmuka Streamlit
 
-Pengantar Kecerdasan Komputasional
+Aplikasi terbagi menjadi tiga halaman utama yang dapat diakses di sidebar kiri:
 
-Topik:
+### A. Jadwal Ujian (Utama)
+1. **Penyetelan Parameter (Sidebar):** Sebelum memulai optimasi, Anda dapat menyetel nilai parameter genetika di panel kiri:
+   * **Population Size:** Jumlah individu dalam populasi (rekomendasi: 50-100).
+   * **Max Generations:** Batas generasi perulangan evolusi (rekomendasi: 50-100).
+   * **Crossover & Mutation Rate:** Probabilitas operator kawin silang dan mutasi gen.
+2. **Menjalankan Optimasi:** Tekan tombol **Mulai Optimasi Jadwal** di bagian tengah atas. Sistem akan menjalankan komparasi Genetic Algorithm versus Greedy secara nyata.
+3. **Filter & Pencarian:** Setelah jadwal terbentuk, Anda dapat mencari jadwal mata kuliah tertentu dengan mengetik kode/nama mata kuliah, atau melakukan filter berdasarkan hari dan sesi tertentu.
+4. **Unduh Berkas:** Tekan tombol **Unduh Jadwal (CSV)** yang muncul di atas tabel untuk mengunduh hasil penjadwalan terbaik ke komputer lokal Anda.
 
-**Evolutionary Computation — Genetic Algorithm**
+### B. Performa & Konflik
+Halaman ini membandingkan kinerja akhir penalti (fitness) antara GA dan Greedy baseline:
+* **Metric Cards:** Menampilkan nilai penalti akhir masing-masing algoritma dan efisiensi peningkatan jadwal.
+* **Charts:** Menampilkan diagram batang perbandingan total penalti dan rincian pelanggaran (Hard Constraint vs Soft Constraints).
+* **Rincian JSON:** Menampilkan visualisasi data mentah pelanggaran untuk laporan analisis detail Anda.
+
+### C. Evolusi Fitness
+Halaman ini menampilkan grafik konvergensi perkembangan nilai fitness terbaik dari populasi di setiap generasi. Kurva meluruh ke bawah membuktikan keberhasilan eksplorasi operator mutasi/crossover hingga mencapai kestabilan (convergence).
 
 ---
 
-## Lisensi
+## Tim Pengembang (Kelompok 17)
 
-Repository ini dikembangkan untuk keperluan akademik sebagai tugas mata kuliah Pengantar Kecerdasan Komputasional.
+| Nama | NIM |
+|------|-----|
+| Husni Abdillah | G6401231097 |
+| Daffa Aulia Musyaffa Subyantoro | G6401231028 |
+| Qois Firosi | G6401231032 |
+| Ghiffari Bravia Hisham | G6401231050 |
+| Naufal Ghifari Afdhala | G6401231029 |

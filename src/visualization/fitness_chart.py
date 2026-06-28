@@ -30,22 +30,20 @@ def plot_fitness_chart(
         df,
         x="generation",
         y="best_fitness",
-        title="Perkembangan Nilai Fitness (Total Penalti) per Generasi",
         labels={"generation": "Generasi", "best_fitness": "Fitness (Total Penalti)"},
         template="plotly_white",
     )
 
     # Mempercantik tampilan grafik agar terlihat premium
     fig.update_traces(
-        line=dict(color="#3b82f6", width=3),  # Blue accent
+        line=dict(color="#4f46e5", width=3),  # Indigo accent
         mode="lines",
         hovertemplate="Generasi: %{x}<br>Fitness: %{y}<extra></extra>",
     )
 
     fig.update_layout(
         hovermode="x unified",
-        margin=dict(l=40, r=40, t=50, b=40),
-        title_font=dict(size=18, family="Outfit, Inter, sans-serif", color="#1e293b"),
+        margin=dict(l=40, r=40, t=20, b=40),
         font=dict(family="Inter, sans-serif", color="#475569"),
         xaxis=dict(
             showgrid=True,

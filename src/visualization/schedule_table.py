@@ -20,10 +20,9 @@ def build_schedule_table(
     else:
         df = schedule_df_or_path.copy()
 
-    # Urutkan secara kronologis: Hari -> Sesi -> Kode Mata Kuliah
+    # Hari -> Sesi -> Kode Mata Kuliah
     df = df.sort_values(by=["day", "session", "course_id"])
 
-    # Mengubah nama kolom menjadi format yang rapi dan mudah dibaca
     df_formatted = df.rename(
         columns={
             "course_id": "Kode Matakuliah",
@@ -34,7 +33,6 @@ def build_schedule_table(
         }
     )
 
-    # Reorder columns just to make it clean
     cols = ["Kode Matakuliah", "Nama Matakuliah", "ID Slot", "Hari", "Sesi"]
     df_formatted = df_formatted[cols]
 

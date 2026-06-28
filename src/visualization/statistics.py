@@ -38,7 +38,7 @@ def plot_fitness_comparison(stats_or_path: dict | Path | str) -> go.Figure:
             go.Bar(
                 x=algorithms,
                 y=fitness_values,
-                marker_color=["#3b82f6", "#94a3b8"],  # Blue vs Slate Gray
+                marker_color=["#4f46e5", "#64748b"],  # Indigo vs Slate Gray
                 text=fitness_values,
                 textposition="auto",
                 hovertemplate="Algoritma: %{x}<br>Total Penalti: %{y}<extra></extra>",
@@ -47,11 +47,9 @@ def plot_fitness_comparison(stats_or_path: dict | Path | str) -> go.Figure:
     )
 
     fig.update_layout(
-        title="Perbandingan Kualitas Solusi (Lebih Rendah Lebih Baik)",
         yaxis_title="Total Penalti",
         template="plotly_white",
-        margin=dict(l=40, r=40, t=50, b=40),
-        title_font=dict(size=16, family="Outfit, Inter, sans-serif", color="#1e293b"),
+        margin=dict(l=40, r=40, t=20, b=40),
         font=dict(family="Inter, sans-serif", color="#475569"),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
@@ -97,24 +95,22 @@ def plot_violations_comparison(stats_or_path: dict | Path | str) -> go.Figure:
                 name="Genetic Algorithm",
                 x=categories,
                 y=ga_vals,
-                marker_color="#3b82f6",
+                marker_color="#4f46e5",
             ),
             go.Bar(
                 name="Greedy Baseline",
                 x=categories,
                 y=greedy_vals,
-                marker_color="#94a3b8",
+                marker_color="#64748b",
             ),
         ]
     )
 
     fig.update_layout(
         barmode="group",
-        title="Perbandingan Detail Pelanggaran & Penalti",
         yaxis_title="Jumlah Pelanggaran / Nilai Penalti",
         template="plotly_white",
-        margin=dict(l=40, r=40, t=50, b=40),
-        title_font=dict(size=16, family="Outfit, Inter, sans-serif", color="#1e293b"),
+        margin=dict(l=40, r=40, t=20, b=40),
         font=dict(family="Inter, sans-serif", color="#475569"),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",

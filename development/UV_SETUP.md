@@ -19,7 +19,7 @@ Sebelum memulai, pastikan telah tersedia:
 # 2. Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/HusniAbdillah/exam-timetabling-ga.git
 
 cd exam-timetabling-ga
 ```
