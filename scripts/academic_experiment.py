@@ -9,6 +9,8 @@ from src.evaluation.greedy import run_greedy
 from src.fitness.fitness import (
     calculate_fitness,
     initialize_fitness_data,
+    set_blocked_slots,
+    set_room_data,
 )
 from src.ga.engine import GAConfig, run_ga
 from src.preprocessing.conflict_matrix import build_conflict_matrix
@@ -20,11 +22,15 @@ from src.utils.constants import DATA_DIR, OUTPUT_DIR
 def run_sensitivity_analysis(
     students, courses, enrollments, timeslots, conflict_matrix, course_ids, slot_ids
 ) -> None:
-    """Run GA with varying parameters to analyze convergence characteristics."""
-    print("\n--- Running Experiment 1: Sensitivity Analysis ---")
-    pop_sizes = [50, 100, 150]
+    """Run Pure GA and Hybrid GA with varying parameters to analyze convergence characteristics."""
+    print("\n--- Running Experiment 1: Sensitivity Analysis (Pure GA & Hybrid GA) ---")
+    pop_sizes = [50, 100]
     mutation_rates = [0.01, 0.05, 0.1, 0.2]
     max_gens = 50
+
+    # Get Greedy seed
+    greedy_res = run_greedy(students, courses, enrollments, timeslots, conflict_matrix)
+    greedy_sol = greedy_res.best_solution
 
     results = []
 
@@ -32,37 +38,72 @@ def run_sensitivity_analysis(
     for pop in pop_sizes:
         for p_mut in mutation_rates:
             print(f"Testing Pop Size: {pop}, Mutation Rate: {p_mut}...")
-            random.seed(42)  # Control seed for direct comparison
 
-            config = GAConfig(
+            # 1. Pure GA
+            random.seed(42)
+            pure_config = GAConfig(
                 population_size=pop,
                 max_generations=max_gens,
                 crossover_rate=0.8,
                 mutation_rate=p_mut,
+                enable_repair=False,
             )
-
-            ga_result = run_ga(
+            pure_res = run_ga(
                 course_ids,
                 slot_ids,
                 conflict_matrix,
-                config,
+                pure_config,
                 calculate_fitness,
+                seeds=None,
+            )
+            history_pure = pure_res.fitness_history
+            results.append(
+                {
+                    "algorithm": "Pure GA",
+                    "population_size": pop,
+                    "mutation_rate": p_mut,
+                    "gen_0": history_pure[0] if len(history_pure) > 0 else None,
+                    "gen_10": history_pure[10] if len(history_pure) > 10 else None,
+                    "gen_20": history_pure[20] if len(history_pure) > 20 else None,
+                    "gen_30": history_pure[30] if len(history_pure) > 30 else None,
+                    "gen_40": history_pure[40] if len(history_pure) > 40 else None,
+                    "gen_50": history_pure[-1] if len(history_pure) > 0 else None,
+                    "best_fitness": pure_res.best_fitness,
+                }
             )
 
-            # Record fitness value at generations 0, 10, 20, 30, 40, 50
-            history = ga_result.fitness_history
-            record = {
-                "population_size": pop,
-                "mutation_rate": p_mut,
-                "gen_0": history[0] if len(history) > 0 else None,
-                "gen_10": history[10] if len(history) > 10 else None,
-                "gen_20": history[20] if len(history) > 20 else None,
-                "gen_30": history[30] if len(history) > 30 else None,
-                "gen_40": history[40] if len(history) > 40 else None,
-                "gen_50": history[-1] if len(history) > 0 else None,
-                "best_fitness": ga_result.best_fitness,
-            }
-            results.append(record)
+            # 2. Hybrid GA
+            random.seed(42)
+            hybrid_config = GAConfig(
+                population_size=pop,
+                max_generations=max_gens,
+                crossover_rate=0.8,
+                mutation_rate=p_mut,
+                enable_repair=True,
+            )
+            hybrid_res = run_ga(
+                course_ids,
+                slot_ids,
+                conflict_matrix,
+                hybrid_config,
+                calculate_fitness,
+                seeds=[greedy_sol],
+            )
+            history_hybrid = hybrid_res.fitness_history
+            results.append(
+                {
+                    "algorithm": "Hybrid GA",
+                    "population_size": pop,
+                    "mutation_rate": p_mut,
+                    "gen_0": history_hybrid[0] if len(history_hybrid) > 0 else None,
+                    "gen_10": history_hybrid[10] if len(history_hybrid) > 10 else None,
+                    "gen_20": history_hybrid[20] if len(history_hybrid) > 20 else None,
+                    "gen_30": history_hybrid[30] if len(history_hybrid) > 30 else None,
+                    "gen_40": history_hybrid[40] if len(history_hybrid) > 40 else None,
+                    "gen_50": history_hybrid[-1] if len(history_hybrid) > 0 else None,
+                    "best_fitness": hybrid_res.best_fitness,
+                }
+            )
 
     # Save to outputs/sensitivity_analysis.csv
     csv_file = OUTPUT_DIR / "sensitivity_analysis.csv"
@@ -72,23 +113,35 @@ def run_sensitivity_analysis(
         writer.writerows(results)
     print(f"Saved sensitivity analysis data to: {csv_file}")
 
-    # Plot and save sensitivity analysis
-    plt.figure(figsize=(10, 6))
+    # Plot and save sensitivity analysis (2 subplots)
+    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+
+    # Subplot 1: Pure GA
+    axes[0].set_title("Sensitivitas Konvergensi - Pure GA")
+    axes[0].set_xlabel("Generasi")
+    axes[0].set_ylabel("Fitness (Total Penalti)")
+    axes[0].grid(True, linestyle="--", alpha=0.6)
+
+    # Subplot 2: Hybrid GA
+    axes[1].set_title("Sensitivitas Konvergensi - Hybrid GA")
+    axes[1].set_xlabel("Generasi")
+    axes[1].set_ylabel("Fitness (Total Penalti)")
+    axes[1].grid(True, linestyle="--", alpha=0.6)
+
     for r in results:
         gens = [0, 10, 20, 30, 40, 50]
         fitness = [r[f"gen_{g}"] for g in gens if r[f"gen_{g}"] is not None]
         x_vals = gens[: len(fitness)]
-        plt.plot(
-            x_vals,
-            fitness,
-            marker="o",
-            label=f"Pop={r['population_size']}, Mut={r['mutation_rate']}",
-        )
-    plt.title("Analisis Sensitivitas - Konvergensi Algoritma Genetika")
-    plt.xlabel("Generasi")
-    plt.ylabel("Fitness (Total Penalti)")
-    plt.grid(True, linestyle="--", alpha=0.6)
-    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
+
+        lbl = f"Pop={r['population_size']}, Mut={r['mutation_rate']}"
+        if r["algorithm"] == "Pure GA":
+            axes[0].plot(x_vals, fitness, marker="o", label=lbl)
+        else:
+            axes[1].plot(x_vals, fitness, marker="s", label=lbl)
+
+    axes[0].legend(loc="upper right")
+    axes[1].legend(loc="upper right")
+
     plt.tight_layout()
     png_file = OUTPUT_DIR / "sensitivity_analysis.png"
     plt.savefig(png_file, dpi=300)
@@ -99,10 +152,12 @@ def run_sensitivity_analysis(
 def run_statistical_significance(
     students, courses, enrollments, timeslots, conflict_matrix, course_ids, slot_ids
 ) -> None:
-    """Run GA 30 times with different seeds to measure stochastic robustness."""
+    """Run Pure GA vs Hybrid GA 30 times with different seeds to measure stochastic robustness."""
     print("\n--- Running Experiment 2: Statistical Significance (30 Runs) ---")
-    fitness_results = []
-    time_results = []
+    pure_fitness = []
+    pure_time = []
+    hybrid_fitness = []
+    hybrid_time = []
     num_runs = 30
 
     config = GAConfig(
@@ -112,47 +167,87 @@ def run_statistical_significance(
         mutation_rate=0.1,
     )
 
+    # Run Greedy once
+    greedy_res = run_greedy(students, courses, enrollments, timeslots, conflict_matrix)
+    greedy_sol = greedy_res.best_solution
+    greedy_fit = greedy_res.best_fitness
+
     for run in range(1, num_runs + 1):
         print(f"Run {run}/{num_runs}...")
-        random.seed(run)  # Vary the seed for each independent run
 
-        ga_result = run_ga(
+        # Pure GA
+        random.seed(run)
+        pure_res = run_ga(
             course_ids,
             slot_ids,
             conflict_matrix,
             config,
             calculate_fitness,
+            seeds=None,
         )
-        fitness_results.append(ga_result.best_fitness)
-        time_results.append(ga_result.execution_time)
+        pure_fitness.append(pure_res.best_fitness)
+        pure_time.append(pure_res.execution_time)
 
-    # Calculate metrics
-    mean_fitness = sum(fitness_results) / num_runs
-    best_fitness = min(fitness_results)
-    worst_fitness = max(fitness_results)
-    std_dev_fitness = math.sqrt(
-        sum((x - mean_fitness) ** 2 for x in fitness_results) / num_runs
+        # Hybrid GA (with repair enabled)
+        random.seed(run)
+        import copy
+
+        hybrid_config = copy.deepcopy(config)
+        hybrid_config.enable_repair = True
+
+        hybrid_res = run_ga(
+            course_ids,
+            slot_ids,
+            conflict_matrix,
+            hybrid_config,
+            calculate_fitness,
+            seeds=[greedy_sol],
+        )
+        hybrid_fitness.append(hybrid_res.best_fitness)
+        hybrid_time.append(hybrid_res.execution_time)
+
+    # Calculate metrics for Pure GA
+    pure_mean = sum(pure_fitness) / num_runs
+    pure_std = math.sqrt(sum((x - pure_mean) ** 2 for x in pure_fitness) / num_runs)
+    pure_mean_time = sum(pure_time) / num_runs
+
+    # Calculate metrics for Hybrid GA
+    hybrid_mean = sum(hybrid_fitness) / num_runs
+    hybrid_std = math.sqrt(
+        sum((x - hybrid_mean) ** 2 for x in hybrid_fitness) / num_runs
     )
-
-    mean_time = sum(time_results) / num_runs
-    total_time = sum(time_results)
+    hybrid_mean_time = sum(hybrid_time) / num_runs
 
     stats_report = {
         "number_of_runs": num_runs,
-        "fitness": {
-            "best_value": best_fitness,
-            "worst_value": worst_fitness,
-            "mean_value": mean_fitness,
-            "standard_deviation": std_dev_fitness,
+        "greedy_baseline": {
+            "fitness": greedy_fit,
+            "execution_time_seconds": greedy_res.execution_time,
         },
-        "time_seconds": {
-            "total_execution_time": total_time,
-            "mean_execution_time": mean_time,
+        "pure_ga": {
+            "best_value": min(pure_fitness),
+            "worst_value": max(pure_fitness),
+            "mean_value": pure_mean,
+            "standard_deviation": pure_std,
+            "mean_execution_time_seconds": pure_mean_time,
+        },
+        "hybrid_ga": {
+            "best_value": min(hybrid_fitness),
+            "worst_value": max(hybrid_fitness),
+            "mean_value": hybrid_mean,
+            "standard_deviation": hybrid_std,
+            "mean_execution_time_seconds": hybrid_mean_time,
         },
         "raw_runs": [
-            {"run": idx + 1, "fitness": f, "time_seconds": t}
-            for idx, (f, t) in enumerate(
-                zip(fitness_results, time_results, strict=True)
+            {
+                "run": idx + 1,
+                "pure_ga_fitness": pf,
+                "pure_ga_time": pt,
+                "hybrid_ga_fitness": hf,
+                "hybrid_ga_time": ht,
+            }
+            for idx, (pf, pt, hf, ht) in enumerate(
+                zip(pure_fitness, pure_time, hybrid_fitness, hybrid_time, strict=True)
             )
         ],
     }
@@ -163,11 +258,32 @@ def run_statistical_significance(
         json.dump(stats_report, f, indent=2)
     print(f"Saved statistical robustness data to: {json_file}")
 
+    # Plot boxplot for statistical significance
+    plt.figure(figsize=(8, 6))
+    data_to_plot = [pure_fitness, hybrid_fitness]
+    plt.boxplot(data_to_plot, labels=["Pure GA", "Hybrid GA"])
+    plt.axhline(
+        y=greedy_fit,
+        color="#ef4444",
+        linestyle="--",
+        linewidth=2,
+        label=f"Greedy Baseline ({greedy_fit:.1f})",
+    )
+    plt.title("Signifikansi Statistik (30 Runs) - Kualitas Solusi (Fitness)")
+    plt.ylabel("Total Penalti (Lebih Rendah Lebih Baik)")
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.legend()
+    plt.tight_layout()
+    png_file = OUTPUT_DIR / "statistical_significance.png"
+    plt.savefig(png_file, dpi=300)
+    plt.close()
+    print(f"Saved statistical significance boxplot to: {png_file}")
+
 
 def run_time_complexity_profile(
     students, courses, enrollments, timeslots, conflict_matrix
 ) -> None:
-    """Compare execution time complexity of GA vs Greedy."""
+    """Compare execution time complexity of Pure GA, Greedy, and Hybrid GA."""
     print("\n--- Running Experiment 3: Time Complexity Profiling ---")
 
     # Measure Greedy Baseline time
@@ -175,14 +291,17 @@ def run_time_complexity_profile(
         students, courses, enrollments, timeslots, conflict_matrix
     )
     greedy_time = greedy_result.execution_time
+    greedy_sol = greedy_result.best_solution
     print(f"Greedy Solver execution time: {greedy_time:.4f} seconds")
 
-    # Measure GA execution time for varying generations
+    # Measure execution time for varying generations
     course_ids = [c.course_id for c in courses]
     slot_ids = [t.slot_id for t in timeslots]
     generations_steps = [5, 10, 20, 40]
 
-    ga_profiles = []
+    pure_profiles = []
+    hybrid_profiles = []
+
     for gens in generations_steps:
         config = GAConfig(
             population_size=50,
@@ -190,30 +309,58 @@ def run_time_complexity_profile(
             crossover_rate=0.8,
             mutation_rate=0.1,
         )
+
+        # Pure GA
         random.seed(42)
-        ga_result = run_ga(
+        pure_res = run_ga(
             course_ids,
             slot_ids,
             conflict_matrix,
             config,
             calculate_fitness,
+            seeds=None,
         )
-        ga_profiles.append(
+        pure_profiles.append(
             {
                 "generations": gens,
-                "population_size": 50,
-                "execution_time_seconds": ga_result.execution_time,
-                "fitness": ga_result.best_fitness,
+                "execution_time_seconds": pure_res.execution_time,
+                "fitness": pure_res.best_fitness,
             }
         )
-        print(f"GA ({gens} gens) time: {ga_result.execution_time:.4f}s")
+
+        # Hybrid GA (with repair enabled)
+        random.seed(42)
+        import copy
+
+        hybrid_config = copy.deepcopy(config)
+        hybrid_config.enable_repair = True
+
+        hybrid_res = run_ga(
+            course_ids,
+            slot_ids,
+            conflict_matrix,
+            hybrid_config,
+            calculate_fitness,
+            seeds=[greedy_sol],
+        )
+        hybrid_profiles.append(
+            {
+                "generations": gens,
+                "execution_time_seconds": hybrid_res.execution_time,
+                "fitness": hybrid_res.best_fitness,
+            }
+        )
+        print(
+            f"Gens {gens}: Pure Time={pure_res.execution_time:.4f}s, Hybrid Time={hybrid_res.execution_time:.4f}s"
+        )
 
     profile_report = {
         "greedy": {
             "execution_time_seconds": greedy_time,
             "fitness": greedy_result.best_fitness,
         },
-        "ga_scaling": ga_profiles,
+        "pure_ga": pure_profiles,
+        "hybrid_ga": hybrid_profiles,
     }
 
     # Save to outputs/time_complexity_profile.json
@@ -224,16 +371,26 @@ def run_time_complexity_profile(
 
     # Plot and save complexity comparison
     plt.figure(figsize=(8, 5))
-    gens = [p["generations"] for p in ga_profiles]
-    times = [p["execution_time_seconds"] for p in ga_profiles]
+    gens = [p["generations"] for p in pure_profiles]
+
+    pure_times = [p["execution_time_seconds"] for p in pure_profiles]
+    hybrid_times = [p["execution_time_seconds"] for p in hybrid_profiles]
 
     plt.plot(
         gens,
-        times,
+        pure_times,
+        marker="o",
+        color="#0ea5e9",
+        linewidth=2,
+        label="Pure GA",
+    )
+    plt.plot(
+        gens,
+        hybrid_times,
         marker="s",
         color="#4f46e5",
         linewidth=2,
-        label="Genetic Algorithm",
+        label="Hybrid GA (Greedy + GA)",
     )
     plt.axhline(
         y=greedy_time,
@@ -243,7 +400,7 @@ def run_time_complexity_profile(
         label="Greedy Baseline",
     )
 
-    plt.title("Profil Kompleksitas Waktu - GA vs Greedy")
+    plt.title("Profil Kompleksitas Waktu - Pure GA vs Greedy vs Hybrid GA")
     plt.xlabel("Jumlah Generasi (Ukuran Populasi = 50)")
     plt.ylabel("Waktu Eksekusi (Detik)")
     plt.grid(True, linestyle="--", alpha=0.6)
@@ -260,7 +417,12 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # 1. Load data
-    students, courses, enrollments, timeslots = load_dataset(DATA_DIR)
+    students, courses, enrollments, timeslots, rooms, slot_blocks = load_dataset(
+        DATA_DIR
+    )
+    # Register additional data for fitness calculations
+    set_room_data(rooms, {c.course_id: c.room_id for c in courses if c.room_id})
+    set_blocked_slots(slot_blocks)
     validate_dataset(students, courses, enrollments, timeslots)
 
     # 2. Build conflicts

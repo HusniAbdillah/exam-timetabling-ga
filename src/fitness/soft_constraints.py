@@ -6,16 +6,14 @@ from src.ga.chromosome import Chromosome
 
 def calculate_consecutive_and_too_many(
     chromosome: Chromosome,
-    student_courses: dict[str, list[str]],
-    course_indices: dict[str, int],
+    student_course_indices: dict[str, list[int]],
     timeslot_map: dict[int, tuple[int, int]],
 ) -> tuple[int, int, int]:
     """Calculate consecutive exams, too many exams, and preferred gap violations.
 
     Args:
         chromosome: Candidate solution mapping course index to slot ID.
-        student_courses: Mapping from student ID to list of course IDs.
-        course_indices: Mapping from course ID to index in chromosome.
+        student_course_indices: Mapping from student ID to list of course indices.
         timeslot_map: Mapping from slot ID to (day, session).
 
     Returns:
@@ -25,14 +23,13 @@ def calculate_consecutive_and_too_many(
     too_many = 0
     pref_gap = 0
 
-    for enrolled_courses in student_courses.values():
+    for indices in student_course_indices.values():
         # Get (day, session) for each course the student is taking
         student_slots = []
-        for cid in enrolled_courses:
-            if cid in course_indices:
-                slot_id = chromosome[course_indices[cid]]
-                if slot_id in timeslot_map:
-                    student_slots.append(timeslot_map[slot_id])
+        for idx in indices:
+            slot_id = chromosome[idx]
+            if slot_id in timeslot_map:
+                student_slots.append(timeslot_map[slot_id])
 
         if not student_slots:
             continue
@@ -94,9 +91,8 @@ def calculate_spread_penalty(
 
 def calculate_same_semester_separation(
     chromosome: Chromosome,
-    course_indices: dict[str, int],
     timeslot_map: dict[int, tuple[int, int]],
-    dept_sem_cores: dict[tuple[str, int], list[str]],
+    dept_sem_core_indices: dict[tuple[str, int], list[int]],
 ) -> int:
     """Calculate penalty when department core courses of the same semester are close.
 
@@ -105,26 +101,24 @@ def calculate_same_semester_separation(
 
     Args:
         chromosome: Candidate solution mapping course index to slot ID.
-        course_indices: Mapping from course ID to index in chromosome.
         timeslot_map: Mapping from slot ID to (day, session).
-        dept_sem_cores: Mapping from (dept_id, semester) to list of core course IDs.
+        dept_sem_core_indices: Mapping from (dept_id, semester) to list of core course indices.
 
     Returns:
         Total same semester core separation violations.
     """
     violations = 0
 
-    for courses in dept_sem_cores.values():
-        if len(courses) < 2:
+    for indices in dept_sem_core_indices.values():
+        if len(indices) < 2:
             continue
 
         # Get days for these courses
         days = []
-        for cid in courses:
-            if cid in course_indices:
-                slot_id = chromosome[course_indices[cid]]
-                if slot_id in timeslot_map:
-                    days.append(timeslot_map[slot_id][0])
+        for idx in indices:
+            slot_id = chromosome[idx]
+            if slot_id in timeslot_map:
+                days.append(timeslot_map[slot_id][0])
 
         if len(days) < 2:
             continue
@@ -139,17 +133,15 @@ def calculate_same_semester_separation(
 
 def calculate_high_enrollment_separation(
     chromosome: Chromosome,
-    course_indices: dict[str, int],
     timeslot_map: dict[int, tuple[int, int]],
-    high_enrollment_courses: set[str],
+    high_enrollment_course_indices: set[int],
 ) -> int:
     """Calculate penalty when multiple high enrollment exams are on the same day.
 
     Args:
         chromosome: Candidate solution mapping course index to slot ID.
-        course_indices: Mapping from course ID to index in chromosome.
         timeslot_map: Mapping from slot ID to (day, session).
-        high_enrollment_courses: Set of course IDs with high student enrollment.
+        high_enrollment_course_indices: Set of course indices with high student enrollment.
 
     Returns:
         Total high enrollment separation violations.
@@ -157,11 +149,10 @@ def calculate_high_enrollment_separation(
     violations = 0
     days = []
 
-    for cid in high_enrollment_courses:
-        if cid in course_indices:
-            slot_id = chromosome[course_indices[cid]]
-            if slot_id in timeslot_map:
-                days.append(timeslot_map[slot_id][0])
+    for idx in high_enrollment_course_indices:
+        slot_id = chromosome[idx]
+        if slot_id in timeslot_map:
+            days.append(timeslot_map[slot_id][0])
 
     if len(days) < 2:
         return 0

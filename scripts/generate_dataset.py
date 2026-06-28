@@ -8,10 +8,10 @@ from src.utils.constants import (
     FACULTY_DEPARTMENTS,
     GENERAL_DEPARTMENT,
     GENERAL_FACULTY,
-    STUDENTS_CSV,
-    TIMESLOTS_CSV,
     ROOMS_CSV,
     SLOT_BLOCKS_CSV,
+    STUDENTS_CSV,
+    TIMESLOTS_CSV,
 )
 
 
@@ -418,7 +418,7 @@ def generate_dataset() -> None:
     for course in courses:
         cid = course["course_id"]
         enrollment_count = course_enrollment_counts.get(cid, 0)
-        
+
         if enrollment_count > 150:
             course["room_id"] = large_rooms[large_index % len(large_rooms)]
             large_index += 1
@@ -491,3 +491,9 @@ def generate_dataset() -> None:
     print(f"- {len(courses)} courses saved to {COURSES_CSV}")
     print(f"- {len(students)} students saved to {STUDENTS_CSV}")
     print(f"- {len(enrollments)} enrollments saved to {ENROLLMENTS_CSV}")
+    print(f"- {len(rooms)} rooms saved to {ROOMS_CSV}")
+    print(f"- {len(slot_blocks)} slot blocks saved to {SLOT_BLOCKS_CSV}")
+
+
+if __name__ == "__main__":
+    generate_dataset()
