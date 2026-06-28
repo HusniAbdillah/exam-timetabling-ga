@@ -261,7 +261,8 @@ def run_statistical_significance(
     # Plot boxplot for statistical significance
     plt.figure(figsize=(8, 6))
     data_to_plot = [pure_fitness, hybrid_fitness]
-    plt.boxplot(data_to_plot, labels=["Pure GA", "Hybrid GA"])
+    plt.boxplot(data_to_plot)
+    plt.xticks([1, 2], ["Pure GA", "Hybrid GA"])
     plt.axhline(
         y=greedy_fit,
         color="#ef4444",
@@ -269,9 +270,12 @@ def run_statistical_significance(
         linewidth=2,
         label=f"Greedy Baseline ({greedy_fit:.1f})",
     )
+    plt.yscale("log")
+    from matplotlib.ticker import ScalarFormatter
+    plt.gca().yaxis.set_major_formatter(ScalarFormatter())
     plt.title("Signifikansi Statistik (30 Runs) - Kualitas Solusi (Fitness)")
-    plt.ylabel("Total Penalti (Lebih Rendah Lebih Baik)")
-    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.ylabel("Total Penalti (Skala Log, Lebih Rendah Lebih Baik)")
+    plt.grid(True, linestyle="--", alpha=0.6, which="both")
     plt.legend()
     plt.tight_layout()
     png_file = OUTPUT_DIR / "statistical_significance.png"
