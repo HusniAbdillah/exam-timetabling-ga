@@ -1,26 +1,26 @@
 {
   "greedy": {
-    "execution_time_seconds": 5.592999999993481,
-    "fitness": 0.4444444444444444
+    "execution_time_seconds": 8.187000000005355,
+    "fitness": 5555.0
   },
   "ga_scaling": [
     {
       "generations": 10,
       "population_size": 50,
-      "execution_time_seconds": 2.7030000000086147,
-      "fitness": 135.57777777777778
+      "execution_time_seconds": 2.9839999999967404,
+      "fitness": 339571.0
     },
     {
       "generations": 50,
       "population_size": 50,
-      "execution_time_seconds": 13.875,
-      "fitness": 3.2444444444444445
+      "execution_time_seconds": 13.75,
+      "fitness": 130243.4
     },
     {
       "generations": 100,
       "population_size": 50,
-      "execution_time_seconds": 30.10899999999674,
-      "fitness": 2.7111111111111112
+      "execution_time_seconds": 27.218999999997322,
+      "fitness": 22572.0
     }
   ]
 }
