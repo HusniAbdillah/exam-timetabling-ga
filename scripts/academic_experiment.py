@@ -415,6 +415,7 @@ def run_time_complexity_profile(
 def main() -> None:
     """Execute the three academic research experiments."""
     import argparse
+
     parser = argparse.ArgumentParser(description="Jalankan Eksperimen Akademik GA.")
     parser.add_argument(
         "--exp",
@@ -464,11 +465,23 @@ def main() -> None:
     # Run selected experiments
     if choice in ["1", "all"]:
         run_sensitivity_analysis(
-            students, courses, enrollments, timeslots, conflict_matrix, course_ids, slot_ids
+            students,
+            courses,
+            enrollments,
+            timeslots,
+            conflict_matrix,
+            course_ids,
+            slot_ids,
         )
     if choice in ["2", "all"]:
         run_statistical_significance(
-            students, courses, enrollments, timeslots, conflict_matrix, course_ids, slot_ids
+            students,
+            courses,
+            enrollments,
+            timeslots,
+            conflict_matrix,
+            course_ids,
+            slot_ids,
         )
     if choice in ["3", "all"]:
         run_time_complexity_profile(
