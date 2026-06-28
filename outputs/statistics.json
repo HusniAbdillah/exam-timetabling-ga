@@ -1,18 +1,26 @@
 {
-  "ga": {
-    "execution_time_seconds": 26.561999999990803,
-    "best_fitness": 3.7777777777777786,
-    "hard_constraint_violations": 0,
+  "pure_ga": {
+    "execution_time_seconds": 21.578000000008615,
+    "best_fitness": 1202688.5,
+    "hard_constraint_violations": 1198,
     "consecutive_exams_violations": 0,
-    "too_many_exams_violations": 0,
-    "spread_penalty": 0.8888888888888892
+    "too_many_exams_violations": 18,
+    "spread_penalty": 22.25
   },
   "greedy": {
-    "execution_time_seconds": 2.9070000000065193,
-    "best_fitness": 0.4444444444444444,
-    "hard_constraint_violations": 0,
+    "execution_time_seconds": 14.264999999999418,
+    "best_fitness": 1221557.5,
+    "hard_constraint_violations": 1216,
+    "consecutive_exams_violations": 0,
+    "too_many_exams_violations": 25,
+    "spread_penalty": 4.25
+  },
+  "hybrid_ga": {
+    "execution_time_seconds": 19.077999999994063,
+    "best_fitness": 1114518.5,
+    "hard_constraint_violations": 1114,
     "consecutive_exams_violations": 0,
     "too_many_exams_violations": 0,
-    "spread_penalty": 0.2222222222222222
+    "spread_penalty": 7.25
   }
 }

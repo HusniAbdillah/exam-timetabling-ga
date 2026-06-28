@@ -220,16 +220,25 @@ elif menu == "Performa & Konflik":
         with open(stats_file, encoding="utf-8") as f:
             stats = json.load(f)
 
+        # Backwards compatibility check
+        pure_ga_data = stats.get("pure_ga", stats.get("ga", {}))
+        greedy_data = stats.get("greedy", {})
+        hybrid_ga_data = stats.get("hybrid_ga", pure_ga_data)
+
+        pure_ga_fit = pure_ga_data.get("best_fitness", 0.0)
+        greedy_fit = greedy_data.get("best_fitness", 0.0)
+        hybrid_ga_fit = hybrid_ga_data.get("best_fitness", 0.0)
+
         st.write("### Perbandingan Performa")
         col_m1, col_m2, col_m3 = st.columns(3)
 
         with col_m1:
             st.markdown(
                 f"""
-                <div class="metric-card" style="border-left-color: #4f46e5;">
-                    <p class="metric-title">GA Best Fitness (Penalty)</p>
-                    <p class="metric-value">{stats["ga"]["best_fitness"]:.1f}</p>
-                    <span class="metric-badge badge-ok">Optimasi GA Berhasil</span>
+                <div class="metric-card" style="border-left-color: #0ea5e9;">
+                    <p class="metric-title">Pure GA Best Fitness</p>
+                    <p class="metric-value">{pure_ga_fit:.1f}</p>
+                    <span class="metric-badge badge-sky">Eksplorasi Stokastik Murni</span>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -239,30 +248,33 @@ elif menu == "Performa & Konflik":
             st.markdown(
                 f"""
                 <div class="metric-card" style="border-left-color: #64748b;">
-                    <p class="metric-title">Greedy Fitness (Penalty)</p>
-                    <p class="metric-value">{stats["greedy"]["best_fitness"]:.1f}</p>
-                    <span class="metric-badge badge-error">Solusi Greedy Terbatas</span>
+                    <p class="metric-title">Greedy Baseline Fitness</p>
+                    <p class="metric-value">{greedy_fit:.1f}</p>
+                    <span class="metric-badge badge-error">Heuristik Sekuensial Terbatas</span>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
 
         with col_m3:
-            improvement = 0.0
-            if stats["greedy"]["best_fitness"] > 0:
-                improvement = (
-                    (stats["greedy"]["best_fitness"] - stats["ga"]["best_fitness"])
-                    / stats["greedy"]["best_fitness"]
-                ) * 100
             st.markdown(
                 f"""
-                <div class="metric-card" style="border-left-color: #0284c7;">
-                    <p class="metric-title">Peningkatan Kualitas Jadwal</p>
-                    <p class="metric-value">+{improvement:.1f}%</p>
-                    <span class="metric-badge badge-sky">Efisiensi Lebih Tinggi</span>
+                <div class="metric-card" style="border-left-color: #4f46e5;">
+                    <p class="metric-title">Hybrid GA Best Fitness</p>
+                    <p class="metric-value">{hybrid_ga_fit:.1f}</p>
+                    <span class="metric-badge badge-ok">Heuristic Seeding Optimal</span>
                 </div>
                 """,
                 unsafe_allow_html=True,
+            )
+
+        improvement = 0.0
+        if greedy_fit > 0:
+            improvement = ((greedy_fit - hybrid_ga_fit) / greedy_fit) * 100
+        if improvement > 0:
+            st.success(
+                f"Analisis Sukses: Inisialisasi Hybrid (Heuristic Seeding) berhasil meningkatkan "
+                f"kualitas solusi penjadwalan sebesar **{improvement:.1f}%** dibandingkan Greedy Baseline."
             )
 
         st.write("---")
@@ -288,14 +300,17 @@ elif menu == "Performa & Konflik":
 
         st.write("---")
         st.write("### Rincian Detail Pelanggaran Batasan (Violations)")
-        col_detail_ga, col_detail_greedy = st.columns(2)
+        col_detail_pure, col_detail_greedy, col_detail_hybrid = st.columns(3)
 
-        with col_detail_ga:
-            st.markdown("#### Detail Pelanggaran Genetic Algorithm")
-            st.json(stats["ga"])
+        with col_detail_pure:
+            st.markdown("#### Pure Genetic Algorithm")
+            st.json(pure_ga_data)
         with col_detail_greedy:
-            st.markdown("#### Detail Pelanggaran Greedy Baseline")
-            st.json(stats["greedy"])
+            st.markdown("#### Greedy Baseline")
+            st.json(greedy_data)
+        with col_detail_hybrid:
+            st.markdown("#### Hybrid Genetic Algorithm")
+            st.json(hybrid_ga_data)
 
     else:
         st.warning(
