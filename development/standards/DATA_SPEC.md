@@ -33,19 +33,20 @@ timeslots.csv
 
 Menyimpan informasi mahasiswa.
 
-| Field         | Tipe    | Keterangan        |
-| ------------- | ------- | ----------------- |
-| student_id    | string  | ID unik mahasiswa |
-| department_id | string  | Program studi     |
-| semester      | integer | Semester aktif    |
+| Field            | Tipe    | Keterangan        |
+| ---------------- | ------- | ----------------- |
+| student_id       | string  | ID unik mahasiswa |
+| faculty_id       | string  | Fakultas          |
+| department_id    | string  | Program studi     |
+| current_semester | integer | Semester aktif    |
 
 Contoh
 
-| student_id | department_id | semester |
-| ---------- | ------------- | -------- |
-| S0001      | IF            | 4        |
-| S0002      | IF            | 4        |
-| S0101      | ST            | 2        |
+| student_id | faculty_id | department_id | current_semester |
+| ---------- | ---------- | ------------- | ---------------- |
+| S0001      | FMIPA      | IF            | 4                |
+| S0002      | FMIPA      | IF            | 4                |
+| S0101      | FMIPA      | ST            | 2                |
 
 ---
 
@@ -53,20 +54,21 @@ Contoh
 
 Menyimpan informasi mata kuliah.
 
-| Field         | Tipe    | Keterangan                        |
-| ------------- | ------- | --------------------------------- |
-| course_id     | string  | ID mata kuliah                    |
-| course_name   | string  | Nama mata kuliah                  |
-| department_id | string  | Program studi pemilik             |
-| semester      | integer | Semester penyelenggaraan          |
-| course_type   | string  | GENERAL, FACULTY, atau DEPARTMENT |
+| Field            | Tipe    | Keterangan                                  |
+| ---------------- | ------- | ------------------------------------------- |
+| course_id        | string  | ID mata kuliah                              |
+| course_name      | string  | Nama mata kuliah                            |
+| faculty_id       | string  | Fakultas yang menawarkan                    |
+| department_id    | string  | Program studi pemilik                       |
+| offered_semester | integer | Semester penyelenggaraan                    |
+| course_type      | string  | GENERAL, FACULTY, DEPARTMENT, atau ELECTIVE |
 
 Contoh
 
-| course_id | course_name   | department_id | semester | course_type |
-| --------- | ------------- | ------------- | -------- | ----------- |
-| IF301     | Struktur Data | IF            | 3        | DEPARTMENT  |
-| MKU101    | Pancasila     | GENERAL       | 1        | GENERAL     |
+| course_id | course_name   | faculty_id | department_id | offered_semester | course_type |
+| --------- | ------------- | ---------- | ------------- | ---------------- | ----------- |
+| IF301     | Struktur Data | FMIPA      | IF            | 3                | DEPARTMENT  |
+| MKU101    | Pancasila     | GENERAL    | GENERAL       | 1                | GENERAL     |
 
 ---
 
@@ -117,23 +119,25 @@ Seluruh modul menggunakan model berikut.
 
 ## Student
 
-| Field         | Tipe   |
-| ------------- | ------ |
-| student_id    | string |
-| department_id | string |
-| semester      | int    |
+| Field            | Tipe   |
+| ---------------- | ------ |
+| student_id       | string |
+| faculty_id       | string |
+| department_id    | string |
+| current_semester | int    |
 
 ---
 
 ## Course
 
-| Field         | Tipe   |
-| ------------- | ------ |
-| course_id     | string |
-| course_name   | string |
-| department_id | string |
-| semester      | int    |
-| course_type   | string |
+| Field            | Tipe   |
+| ---------------- | ------ |
+| course_id        | string |
+| course_name      | string |
+| faculty_id       | string |
+| department_id    | string |
+| offered_semester | int    |
+| course_type      | string |
 
 ---
 
@@ -318,13 +322,16 @@ Output
 ### Rumus Evaluasi Penalti
 Optimasi dilakukan dengan meminimalkan total penalti (*lower penalty is better*). Rumus perhitungan penalti didefinisikan sebagai:
 
-$$\text{penalty} = 1000 \times \text{Hard Constraint} + 10 \times \text{Consecutive Exams} + 5 \times \text{Too Many Exams Per Day} + 2 \times \text{Spread Penalty}$$
+$$\text{penalty} = 1000 \times \text{Hard Constraint} + 10 \times \text{Consecutive Exams} + 5 \times \text{Too Many Exams Per Day} + 2 \times \text{Spread Penalty} + 3 \times \text{Same Semester Core Separation} + 2 \times \text{High Enrollment Exam Separation} + 1 \times \text{Preferred Gap}$$
 
 Di mana:
 * **Hard Constraint**: Jumlah mahasiswa yang memiliki jadwal ujian bentrok (pada slot yang sama).
 * **Consecutive Exams**: Jumlah kejadian mahasiswa memiliki ujian berurutan/berturut-turut pada hari yang sama.
 * **Too Many Exams Per Day**: Jumlah kejadian mahasiswa memiliki lebih dari dua ujian dalam satu hari.
 * **Spread Penalty**: Penalti penyebaran ujian untuk mengukur ketidakmerataan distribusi ujian pada slot waktu yang tersedia.
+* **Same Semester Core Separation**: Penalti ketika mata kuliah wajib pada semester dan jurusan yang sama dijadwalkan pada hari yang sama atau berurutan.
+* **High Enrollment Exam Separation**: Penalti ketika beberapa mata kuliah umum/besar dijadwalkan pada hari yang sama.
+* **Preferred Gap**: Penalti ketika mahasiswa memiliki ujian di sesi yang berurutan tanpa jeda minimal satu slot kosong.
 
 ---
 
