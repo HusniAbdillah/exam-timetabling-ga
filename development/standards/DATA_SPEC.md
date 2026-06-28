@@ -25,6 +25,8 @@ students.csv
 courses.csv
 enrollment.csv
 timeslots.csv
+rooms.csv
+slot_blocks.csv
 ```
 
 ---
@@ -62,13 +64,14 @@ Menyimpan informasi mata kuliah.
 | department_id    | string  | Program studi pemilik                       |
 | offered_semester | integer | Semester penyelenggaraan                    |
 | course_type      | string  | GENERAL, FACULTY, DEPARTMENT, atau ELECTIVE |
+| room_id          | string  | ID ruangan yang dialokasikan                |
 
 Contoh
 
-| course_id | course_name   | faculty_id | department_id | offered_semester | course_type |
-| --------- | ------------- | ---------- | ------------- | ---------------- | ----------- |
-| IF301     | Struktur Data | FMIPA      | IF            | 3                | DEPARTMENT  |
-| MKU101    | Pancasila     | GENERAL    | GENERAL       | 1                | GENERAL     |
+| course_id | course_name   | faculty_id | department_id | offered_semester | course_type | room_id |
+| --------- | ------------- | ---------- | ------------- | ---------------- | ----------- | ------- |
+| IF301     | Struktur Data | FMIPA      | IF            | 3                | DEPARTMENT  | R001    |
+| MKU101    | Pancasila     | GENERAL    | GENERAL       | 1                | GENERAL     | R002    |
 
 ---
 
@@ -113,6 +116,43 @@ Contoh
 
 ---
 
+# 6a. rooms.csv
+
+Menyimpan informasi kapasitas ruangan.
+
+| Field   | Tipe    | Keterangan        |
+| ------- | ------- | ----------------- |
+| room_id | string  | ID unik ruangan   |
+| capacity| integer | Kapasitas ruangan |
+
+Contoh
+
+| room_id | capacity |
+| ------- | -------- |
+| R001    | 300      |
+| R002    | 150      |
+
+---
+
+# 6b. slot_blocks.csv
+
+Menyimpan informasi pemblokiran slot ujian untuk fakultas tertentu.
+
+| Field      | Tipe    | Keterangan              |
+| ---------- | ------- | ----------------------- |
+| faculty_id | string  | ID fakultas             |
+| day        | integer | Hari ujian yang diblok  |
+| session    | integer | Sesi ujian yang diblok  |
+
+Contoh
+
+| faculty_id | day | session |
+| ---------- | --- | ------- |
+| FMIPA      | 1   | 1       |
+| FATETA     | 2   | 2       |
+
+---
+
 # 7. Model Data
 
 Seluruh modul menggunakan model berikut.
@@ -138,6 +178,16 @@ Seluruh modul menggunakan model berikut.
 | department_id    | string |
 | offered_semester | int    |
 | course_type      | string |
+| room_id          | string |
+
+---
+
+## Room
+
+| Field    | Tipe   |
+| -------- | ------ |
+| room_id  | string |
+| capacity | int    |
 
 ---
 
@@ -283,11 +333,14 @@ Input
 * courses.csv
 * enrollment.csv
 * timeslots.csv
+* rooms.csv
+* slot_blocks.csv
 
 Output
 
 * Student
 * Course
+* Room
 * Enrollment
 * Timeslot
 * Conflict Matrix
@@ -314,15 +367,17 @@ Input
 
 * Chromosome
 * Conflict Matrix
+* Rooms data
+* Slot Blocks data
 
 Output
 
-* Fitness Value (Evaluasi Pinalti)
+* Fitness Value (Evaluasi Penalti)
 
 ### Rumus Evaluasi Penalti
 Optimasi dilakukan dengan meminimalkan total penalti (*lower penalty is better*). Rumus perhitungan penalti didefinisikan sebagai:
 
-$$\text{penalty} = 1000 \times \text{Hard Constraint} + 10 \times \text{Consecutive Exams} + 5 \times \text{Too Many Exams Per Day} + 2 \times \text{Spread Penalty} + 3 \times \text{Same Semester Core Separation} + 2 \times \text{High Enrollment Exam Separation} + 1 \times \text{Preferred Gap}$$
+$$\text{penalty} = 1000 \times \text{Hard Constraint} + 10 \times \text{Consecutive Exams} + 5 \times \text{Too Many Exams Per Day} + 30 \times \text{Spread Penalty} + 3 \times \text{Same Semester Core Separation} + 2 \times \text{High Enrollment Exam Separation} + 1 \times \text{Preferred Gap} + 200 \times \text{Max Exams Per Day Violations} + 300 \times \text{Room Capacity Violations} + 250 \times \text{Slot Block Violations}$$
 
 Di mana:
 * **Hard Constraint**: Jumlah mahasiswa yang memiliki jadwal ujian bentrok (pada slot yang sama).
@@ -332,6 +387,9 @@ Di mana:
 * **Same Semester Core Separation**: Penalti ketika mata kuliah wajib pada semester dan jurusan yang sama dijadwalkan pada hari yang sama atau berurutan.
 * **High Enrollment Exam Separation**: Penalti ketika beberapa mata kuliah umum/besar dijadwalkan pada hari yang sama.
 * **Preferred Gap**: Penalti ketika mahasiswa memiliki ujian di sesi yang berurutan tanpa jeda minimal satu slot kosong.
+* **Max Exams Per Day Violations**: Penalti ketika mahasiswa melebihi batas maksimal ujian per hari (default: 2 ujian per hari).
+* **Room Capacity Violations**: Penalti ketika kapasitas ruang ujian terlampaui oleh jumlah mahasiswa terdaftar dalam slot/ruangan tersebut.
+* **Slot Block Violations**: Penalti ketika ujian dijadwalkan pada slot yang diblokir oleh fakultas (dosen tidak bersedia/bentrok).
 
 ---
 
@@ -398,29 +456,44 @@ Menyimpan perkembangan nilai fitness (penalti terbaik) dari setiap generasi sela
 | Field | Tipe | Keterangan |
 | --- | --- | --- |
 | generation | integer | Generasi ke-n (0-indexed) |
-| best_fitness | float | Nilai fitness (penalti) terbaik pada generasi tersebut |
+| pure_ga_fitness | float | Nilai fitness (penalti) terbaik Pure GA pada generasi tersebut |
+| hybrid_ga_fitness | float | Nilai fitness (penalti) terbaik Hybrid GA pada generasi tersebut |
 
 Contoh isi:
 ```csv
-generation,best_fitness
-0,1520.0
-1,1210.0
-2,850.0
+generation,pure_ga_fitness,hybrid_ga_fitness
+0,1520.0,1200.0
+1,1210.0,900.0
+2,850.0,600.0
 ```
 
 ### 13.3 statistics.json
-Menyimpan perbandingan performa antara algoritma Genetic Algorithm (GA) dan Greedy baseline, beserta rincian pelanggaran batasannya (constraint).
+Menyimpan perbandingan performa antara algoritma Pure Genetic Algorithm (Pure GA), Hybrid Genetic Algorithm (Hybrid GA), dan Greedy baseline, beserta rincian pelanggaran batasannya (constraint).
 
 Format berkas JSON:
 ```json
 {
-  "ga": {
+  "pure_ga": {
     "execution_time_seconds": float,
     "best_fitness": float,
     "hard_constraint_violations": integer,
     "consecutive_exams_violations": integer,
     "too_many_exams_violations": integer,
-    "spread_penalty": float
+    "spread_penalty": float,
+    "max_exams_per_day_violations": integer,
+    "room_capacity_violations": integer,
+    "slot_block_violations": integer
+  },
+  "hybrid_ga": {
+    "execution_time_seconds": float,
+    "best_fitness": float,
+    "hard_constraint_violations": integer,
+    "consecutive_exams_violations": integer,
+    "too_many_exams_violations": integer,
+    "spread_penalty": float,
+    "max_exams_per_day_violations": integer,
+    "room_capacity_violations": integer,
+    "slot_block_violations": integer
   },
   "greedy": {
     "execution_time_seconds": float,
@@ -428,7 +501,10 @@ Format berkas JSON:
     "hard_constraint_violations": integer,
     "consecutive_exams_violations": integer,
     "too_many_exams_violations": integer,
-    "spread_penalty": float
+    "spread_penalty": float,
+    "max_exams_per_day_violations": integer,
+    "room_capacity_violations": integer,
+    "slot_block_violations": integer
   }
 }
 ```

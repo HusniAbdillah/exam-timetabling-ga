@@ -22,16 +22,16 @@ Implementasi **Genetic Algorithm (GA)** untuk menyelesaikan permasalahan **Unive
 
 ## Deskripsi
 
-Proyek ini membangun sistem optimasi penjadwalan ujian pada sebuah universitas yang terdiri atas beberapa fakultas, program studi, dan mata kuliah. Fokus utama adalah menentukan penempatan setiap ujian ke dalam slot waktu (timeslot) sedemikian rupa sehingga konflik bentrokan jadwal mahasiswa dapat diminimalkan (Hard Constraint) dan kenyamanan penyebaran ujian dapat ditingkatkan (Soft Constraints).
+Proyek ini membangun sistem optimasi penjadwalan ujian pada sebuah universitas yang terdiri atas beberapa fakultas, program studi, dan mata kuliah. Fokus utama adalah menentukan penempatan setiap ujian ke dalam slot waktu (timeslot) sedemikian rupa sehingga konflik bentrokan jadwal mahasiswa dapat diminimalkan (Hard Constraint), alokasi kapasitas ruang ujian statis (`rooms.csv`) terpenuhi, serta batasan pemblokiran jadwal fakultas (`slot_blocks.csv`) dipatuhi. Sistem ini juga mengoptimalkan penyebaran ujian mahasiswa lewat serangkaian Soft Constraints.
 
-Model yang digunakan membatasi ruang lingkup optimasi pada **penempatan ujian ke slot waktu (Exam -> Timeslot)**. Penjadwalan ruang ujian, pengawas, maupun kapasitas fisik ruangan tidak termasuk dalam cakupan sistem agar implementasi berfokus secara mendalam pada mekanisme evolusi GA.
+Optimasi dilakukan menggunakan pendekatan Genetic Algorithm (Pure GA dan Hybrid GA dengan memetic repair mechanism) yang kemudian dibandingkan dengan Greedy baseline.
 
 ---
 
 ## Alur Eksekusi Sistem (Workflow)
 
 ```text
-1. Sinkronisasi Depedensi (uv sync)
+1. Sinkronisasi Dependensi (uv sync)
                 │
                 ▼
 2. Generator Dataset (generate_dataset.py) -> Membuat data/
@@ -65,11 +65,11 @@ uv sync
 ```
 
 ### 3. Membangkitkan Dataset Simulasi
-Sebelum menjalankan aplikasi, Anda harus membangkitkan data simulasi universitas terlebih dahulu. Data ini meliputi file mahasiswa, kelas, jadwal dasar, dan pendaftaran:
+Sebelum menjalankan aplikasi, Anda harus membangkitkan data simulasi universitas terlebih dahulu. Data ini meliputi file mahasiswa, kelas, jadwal dasar, pendaftaran, ruangan, dan blokir sesi:
 ```bash
 uv run python scripts/generate_dataset.py
 ```
-*Hasil keluaran disimpan di folder `data/` (`students.csv`, `courses.csv`, `enrollment.csv`, `timeslots.csv`).*
+*Hasil keluaran disimpan di folder `data/` (`students.csv`, `courses.csv`, `enrollment.csv`, `timeslots.csv`, `rooms.csv`, `slot_blocks.csv`).*
 
 ### 4. Menjalankan Unit Test
 Verifikasi keselarasan logika mutasi, crossover, conflict matrix, dan perhitungan fitness:
@@ -96,7 +96,7 @@ Untuk menghasilkan data analisis sensitivitas parameter (populasi & mutasi), uji
 ```bash
 uv run python scripts/academic_experiment.py
 ```
-*Hasil analisis disimpan di folder `outputs/` (`sensitivity_analysis.csv`, `statistical_significance.json`, `time_complexity_profile.json`).*
+*Hasil analisis disimpan di folder `outputs/` (`sensitivity_analysis.csv`, `sensitivity_analysis.png`, `statistical_significance.json`, `statistical_significance.png`, `time_complexity_profile.json`).*
 
 ---
 
