@@ -231,10 +231,10 @@ def run_ga(
             # Apply greedy repair if enabled (Memetic GA local search probability = 0.2)
             if config.enable_repair and random.random() < 0.20:
                 child1 = repair_chromosome(
-                    child1, conflict_matrix, timeslots, fitness_fn
+                    child1, courses, conflict_matrix, timeslots, fitness_fn
                 )
                 child2 = repair_chromosome(
-                    child2, conflict_matrix, timeslots, fitness_fn
+                    child2, courses, conflict_matrix, timeslots, fitness_fn
                 )
 
             next_population.append(child1)
@@ -263,25 +263,36 @@ def run_ga(
 
 def repair_chromosome(
     chromosome: Chromosome,
+    courses: list[str],
     conflict_matrix: ConflictMatrix,
     timeslots: list[int],
     fitness_fn: FitnessFn,
 ) -> Chromosome:
     """Greedy repair mechanism for Hybrid GA.
 
-    It goes through each gene (course) and if reassigning it to another timeslot
-    improves the overall fitness, it keeps the change. This is a simple
-    local search repair to push individuals towards feasibility.
+    It identifies courses that actively cause student exam clashes,
+    and tries reassigning up to 3 of them to other timeslots to minimize penalty.
     """
     repaired = chromosome[:]
-    # We randomly check some courses to repair to avoid high overhead
-    indices = list(range(len(repaired)))
-    random.shuffle(indices)
+    # Find only courses that are actively conflicting in the current schedule
+    conflicting_indices = []
+    for i in range(len(repaired)):
+        cid_i = courses[i]
+        slot_i = repaired[i]
+        for j in range(len(repaired)):
+            if i != j and repaired[j] == slot_i:
+                if courses[j] in conflict_matrix.get(cid_i, set()):
+                    conflicting_indices.append(i)
+                    break
 
-    # We only repair courses that might have violations.
-    # To keep it fast, we attempt to repair up to 20% of courses in a single generation.
-    num_to_repair = max(1, len(repaired) // 5)
-    for idx in indices[:num_to_repair]:
+    if not conflicting_indices:
+        return repaired
+
+    # Limit to maximum 3 conflicting courses to repair per invocation for high performance
+    random.shuffle(conflicting_indices)
+    num_to_repair = min(3, len(conflicting_indices))
+
+    for idx in conflicting_indices[:num_to_repair]:
         current_slot = repaired[idx]
         current_penalty = fitness_fn(repaired, conflict_matrix, timeslots)
 

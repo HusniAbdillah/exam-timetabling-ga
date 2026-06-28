@@ -1,50 +1,50 @@
 {
   "greedy": {
-    "execution_time_seconds": 11.75,
-    "fitness": 1218831.5
+    "execution_time_seconds": 10.28200000000652,
+    "fitness": 8522.0
   },
   "pure_ga": [
     {
       "generations": 5,
-      "execution_time_seconds": 2.75,
-      "fitness": 1822557.5
+      "execution_time_seconds": 1.735000000000582,
+      "fitness": 637516.0
     },
     {
       "generations": 10,
-      "execution_time_seconds": 5.4060000000026776,
-      "fitness": 1589388.5
+      "execution_time_seconds": 4.01600000000326,
+      "fitness": 378834.0
     },
     {
       "generations": 20,
-      "execution_time_seconds": 10.453000000008615,
-      "fitness": 1352388.5
+      "execution_time_seconds": 7.85899999999674,
+      "fitness": 252014.0
     },
     {
       "generations": 40,
-      "execution_time_seconds": 17.562999999994645,
-      "fitness": 1226253.5
+      "execution_time_seconds": 20.5,
+      "fitness": 113014.0
     }
   ],
   "hybrid_ga": [
     {
       "generations": 5,
-      "execution_time_seconds": 2.610000000000582,
-      "fitness": 1189555.5
+      "execution_time_seconds": 11.889999999999418,
+      "fitness": 8464.0
     },
     {
       "generations": 10,
-      "execution_time_seconds": 4.8439999999973224,
-      "fitness": 1104482.5
+      "execution_time_seconds": 20.468999999997322,
+      "fitness": 8392.0
     },
     {
       "generations": 20,
-      "execution_time_seconds": 9.264999999999418,
-      "fitness": 1103486.5
+      "execution_time_seconds": 49.453000000008615,
+      "fitness": 8130.0
     },
     {
       "generations": 40,
-      "execution_time_seconds": 21.656000000002678,
-      "fitness": 1073684.5
+      "execution_time_seconds": 69.73399999999674,
+      "fitness": 7862.0
     }
   ]
 }
