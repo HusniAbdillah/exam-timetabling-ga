@@ -414,6 +414,33 @@ def run_time_complexity_profile(
 
 def main() -> None:
     """Execute the three academic research experiments."""
+    import argparse
+    parser = argparse.ArgumentParser(description="Jalankan Eksperimen Akademik GA.")
+    parser.add_argument(
+        "--exp",
+        choices=["1", "2", "3", "all"],
+        default=None,
+        help="Nomor eksperimen yang ingin dijalankan (1: Sensitivitas, 2: Signifikansi Statistik, 3: Kompleksitas Waktu, all: Semua)",
+    )
+    args = parser.parse_args()
+
+    choice = args.exp
+    if choice is None:
+        print("\nPilih eksperimen yang ingin dijalankan:")
+        print("1. Eksperimen 1: Analisis Sensitivitas (Pure GA vs Hybrid GA)")
+        print("2. Eksperimen 2: Signifikansi Statistik (30 Runs)")
+        print("3. Eksperimen 3: Profil Kompleksitas Waktu")
+        print("4. Jalankan Semua Eksperimen")
+        ans = input("Masukkan pilihan (1/2/3/4): ").strip()
+        if ans == "1":
+            choice = "1"
+        elif ans == "2":
+            choice = "2"
+        elif ans == "3":
+            choice = "3"
+        else:
+            choice = "all"
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # 1. Load data
@@ -434,18 +461,21 @@ def main() -> None:
     course_ids = [c.course_id for c in courses]
     slot_ids = [t.slot_id for t in timeslots]
 
-    # Run Experiments
-    run_sensitivity_analysis(
-        students, courses, enrollments, timeslots, conflict_matrix, course_ids, slot_ids
-    )
-    run_statistical_significance(
-        students, courses, enrollments, timeslots, conflict_matrix, course_ids, slot_ids
-    )
-    run_time_complexity_profile(
-        students, courses, enrollments, timeslots, conflict_matrix
-    )
+    # Run selected experiments
+    if choice in ["1", "all"]:
+        run_sensitivity_analysis(
+            students, courses, enrollments, timeslots, conflict_matrix, course_ids, slot_ids
+        )
+    if choice in ["2", "all"]:
+        run_statistical_significance(
+            students, courses, enrollments, timeslots, conflict_matrix, course_ids, slot_ids
+        )
+    if choice in ["3", "all"]:
+        run_time_complexity_profile(
+            students, courses, enrollments, timeslots, conflict_matrix
+        )
 
-    print("\nAll academic experiments completed successfully!")
+    print("\nPembentukan grafik dan analisis eksperimen selesai!")
 
 
 if __name__ == "__main__":
