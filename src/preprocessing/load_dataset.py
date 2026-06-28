@@ -15,10 +15,6 @@ def load_students(path: Path) -> list[Student]:
 
     Returns:
         List of Student dataclasses.
-
-    Raises:
-        FileNotFoundError: If the file does not exist.
-        ValueError: If headers are missing or columns have invalid data.
     """
     if not path.exists():
         raise FileNotFoundError(f"Students file not found at: {path}")
@@ -31,11 +27,9 @@ def load_students(path: Path) -> list[Student]:
             reader = csv.DictReader(f)
             if not reader.fieldnames:
                 raise ValueError(f"CSV file is empty: {path}")
-
             missing = required_cols - set(reader.fieldnames)
             if missing:
                 raise ValueError(f"Missing required columns in students CSV: {missing}")
-
             for row_idx, row in enumerate(reader, start=2):
                 try:
                     students.append(
@@ -54,7 +48,6 @@ def load_students(path: Path) -> list[Student]:
         if not isinstance(e, (FileNotFoundError, ValueError)):
             raise ValueError(f"Failed to parse students CSV: {e}") from e
         raise
-
     return students
 
 
@@ -66,10 +59,6 @@ def load_courses(path: Path) -> list[Course]:
 
     Returns:
         List of Course dataclasses.
-
-    Raises:
-        FileNotFoundError: If the file does not exist.
-        ValueError: If headers are missing or columns have invalid data.
     """
     if not path.exists():
         raise FileNotFoundError(f"Courses file not found at: {path}")
@@ -83,17 +72,16 @@ def load_courses(path: Path) -> list[Course]:
         "offered_semester",
         "course_type",
     }
+    # Optional column room_id for room assignment
 
     try:
         with open(path, encoding="utf-8") as f:
             reader = csv.DictReader(f)
             if not reader.fieldnames:
                 raise ValueError(f"CSV file is empty: {path}")
-
             missing = required_cols - set(reader.fieldnames)
             if missing:
                 raise ValueError(f"Missing required columns in courses CSV: {missing}")
-
             for row_idx, row in enumerate(reader, start=2):
                 try:
                     courses.append(
@@ -104,6 +92,8 @@ def load_courses(path: Path) -> list[Course]:
                             department_id=row["department_id"].strip(),
                             offered_semester=int(row["offered_semester"]),
                             course_type=row["course_type"].strip(),
+                            # If room_id column exists, include it; otherwise empty string
+                            room_id=row.get("room_id", "").strip(),
                         )
                     )
                 except ValueError as e:
@@ -114,7 +104,6 @@ def load_courses(path: Path) -> list[Course]:
         if not isinstance(e, (FileNotFoundError, ValueError)):
             raise ValueError(f"Failed to parse courses CSV: {e}") from e
         raise
-
     return courses
 
 
@@ -126,10 +115,6 @@ def load_enrollments(path: Path) -> list[Enrollment]:
 
     Returns:
         List of Enrollment dataclasses.
-
-    Raises:
-        FileNotFoundError: If the file does not exist.
-        ValueError: If headers are missing.
     """
     if not path.exists():
         raise FileNotFoundError(f"Enrollment file not found at: {path}")
@@ -142,13 +127,11 @@ def load_enrollments(path: Path) -> list[Enrollment]:
             reader = csv.DictReader(f)
             if not reader.fieldnames:
                 raise ValueError(f"CSV file is empty: {path}")
-
             missing = required_cols - set(reader.fieldnames)
             if missing:
                 raise ValueError(
                     f"Missing required columns in enrollment CSV: {missing}"
                 )
-
             for row in reader:
                 enrollments.append(
                     Enrollment(
@@ -160,7 +143,6 @@ def load_enrollments(path: Path) -> list[Enrollment]:
         if not isinstance(e, (FileNotFoundError, ValueError)):
             raise ValueError(f"Failed to parse enrollment CSV: {e}") from e
         raise
-
     return enrollments
 
 
@@ -172,10 +154,6 @@ def load_timeslots(path: Path) -> list[Timeslot]:
 
     Returns:
         List of Timeslot dataclasses.
-
-    Raises:
-        FileNotFoundError: If the file does not exist.
-        ValueError: If headers are missing or columns have invalid data.
     """
     if not path.exists():
         raise FileNotFoundError(f"Timeslots file not found at: {path}")
@@ -188,13 +166,11 @@ def load_timeslots(path: Path) -> list[Timeslot]:
             reader = csv.DictReader(f)
             if not reader.fieldnames:
                 raise ValueError(f"CSV file is empty: {path}")
-
             missing = required_cols - set(reader.fieldnames)
             if missing:
                 raise ValueError(
                     f"Missing required columns in timeslots CSV: {missing}"
                 )
-
             for row_idx, row in enumerate(reader, start=2):
                 try:
                     timeslots.append(
@@ -212,29 +188,90 @@ def load_timeslots(path: Path) -> list[Timeslot]:
         if not isinstance(e, (FileNotFoundError, ValueError)):
             raise ValueError(f"Failed to parse timeslots CSV: {e}") from e
         raise
-
     return timeslots
+
+
+def load_rooms(path: Path) -> dict[str, int]:
+    """Load room capacities from a CSV file.
+
+    Expected columns: room_id,capacity
+    Returns a mapping of room_id -> capacity. If file missing, returns empty dict.
+    """
+    if not path.exists():
+        return {}
+    rooms: dict[str, int] = {}
+    required_cols = {"room_id", "capacity"}
+    try:
+        with open(path, encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            if not reader.fieldnames:
+                raise ValueError(f"CSV file is empty: {path}")
+            missing = required_cols - set(reader.fieldnames)
+            if missing:
+                raise ValueError(f"Missing required columns in rooms CSV: {missing}")
+            for row in reader:
+                room_id = row["room_id"].strip()
+                capacity = int(row["capacity"])
+                rooms[room_id] = capacity
+    except Exception as e:
+        raise ValueError(f"Failed to parse rooms CSV: {e}") from e
+    return rooms
+
+
+def load_slot_blocks(path: Path) -> set[tuple[str, int, int]]:
+    """Load faculty slot block constraints.
+
+    Expected columns: faculty_id,day,session
+    Returns a set of (faculty_id, day, session) tuples. If file missing, returns empty set.
+    """
+    if not path.exists():
+        return set()
+    blocks: set[tuple[str, int, int]] = set()
+    required_cols = {"faculty_id", "day", "session"}
+    try:
+        with open(path, encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            if not reader.fieldnames:
+                raise ValueError(f"CSV file is empty: {path}")
+            missing = required_cols - set(reader.fieldnames)
+            if missing:
+                raise ValueError(
+                    f"Missing required columns in slot_blocks CSV: {missing}"
+                )
+            for row in reader:
+                fac = row["faculty_id"].strip()
+                day = int(row["day"])
+                session = int(row["session"])
+                blocks.add((fac, day, session))
+    except Exception as e:
+        raise ValueError(f"Failed to parse slot_blocks CSV: {e}") from e
+    return blocks
 
 
 def load_dataset(
     data_dir: Path,
-) -> tuple[list[Student], list[Course], list[Enrollment], list[Timeslot]]:
+) -> tuple[
+    list[Student],
+    list[Course],
+    list[Enrollment],
+    list[Timeslot],
+    dict[str, int],
+    set[tuple[str, int, int]],
+]:
     """Load all scheduling data from a dataset directory.
 
     Args:
-        data_dir: Directory containing the four CSV files:
-            students.csv, courses.csv, enrollment.csv, timeslots.csv.
+        data_dir: Directory containing the CSV files:
+            students.csv, courses.csv, enrollment.csv, timeslots.csv,
+            rooms.csv (optional), slot_blocks.csv (optional).
 
     Returns:
-        A tuple of (students, courses, enrollments, timeslots).
-
-    Raises:
-        FileNotFoundError: If any of the required files are missing.
-        ValueError: If any validation or parsing errors occur.
+        A tuple of (students, courses, enrollments, timeslots, rooms, slot_blocks).
     """
     students = load_students(data_dir / "students.csv")
     courses = load_courses(data_dir / "courses.csv")
     enrollments = load_enrollments(data_dir / "enrollment.csv")
     timeslots = load_timeslots(data_dir / "timeslots.csv")
-
-    return students, courses, enrollments, timeslots
+    rooms = load_rooms(data_dir / "rooms.csv")
+    slot_blocks = load_slot_blocks(data_dir / "slot_blocks.csv")
+    return students, courses, enrollments, timeslots, rooms, slot_blocks
