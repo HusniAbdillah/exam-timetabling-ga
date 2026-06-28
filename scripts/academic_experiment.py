@@ -180,7 +180,7 @@ def run_time_complexity_profile(
     # Measure GA execution time for varying generations
     course_ids = [c.course_id for c in courses]
     slot_ids = [t.slot_id for t in timeslots]
-    generations_steps = [10, 50, 100]
+    generations_steps = [5, 10, 20, 40]
 
     ga_profiles = []
     for gens in generations_steps:
