@@ -1,151 +1,151 @@
 course_id,course_name,slot_id,day,session
-GEN101,Pancasila,4,4,1
-GEN102,Pendidikan Agama,2,2,1
-GEN103,Bahasa Indonesia,4,4,1
-GEN104,Bahasa Inggris,3,3,1
-GEN105,Kewirausahaan,1,1,1
-GEN201,Metode Ilmiah,3,3,1
-GEN202,Pendidikan Kewarganegaraan,4,4,1
-GEN203,Etika Profesi,1,1,1
-FMA101,Kalkulus I,2,2,1
-FMA102,Aljabar Linear,4,4,1
-FTA101,Fisika Dasar I,3,3,1
-FTA102,Kimia Dasar,3,3,1
-FEM101,Pengantar Ekonomi,2,2,1
-FEM102,Pengantar Bisnis,3,3,1
+GEN101,Pancasila,9,5,1
+GEN102,Pendidikan Agama,9,5,1
+GEN103,Bahasa Indonesia,6,3,2
+GEN104,Bahasa Inggris,4,2,2
+GEN105,Kewirausahaan,3,2,1
+GEN201,Metode Ilmiah,5,3,1
+GEN202,Pendidikan Kewarganegaraan,5,3,1
+GEN203,Etika Profesi,5,3,1
+FMA101,Kalkulus I,3,2,1
+FMA102,Aljabar Linear,1,1,1
+FTA101,Fisika Dasar I,1,1,1
+FTA102,Kimia Dasar,8,4,2
+FEM101,Pengantar Ekonomi,1,1,1
+FEM102,Pengantar Bisnis,3,2,1
 FMA201,Sosiologi Umum,1,1,1
-FMA202,Ekologi Manusia,3,3,1
+FMA202,Ekologi Manusia,4,2,2
 FPT101,Biologi Umum,1,1,1
-FPT102,Pengantar Peternakan,3,3,1
-KOM201,Pemrograman Dasar,3,3,1
-KOM202,PBO,2,2,1
-KOM203,Matematika Diskrit,4,4,1
-KOM204,Arsitektur Komputer,1,1,1
-KOM401,Struktur Data,4,4,1
-KOM402,Sistem Operasi,2,2,1
-KOM403,Analisis Algoritma,1,1,1
-KOM404,Basis Data,1,1,1
-KOM601,Jaringan Komputer,4,4,1
-KOM602,Rekayasa Perangkat Lunak,2,2,1
-KOM603,Kecerdasan Buatan,1,1,1
-KOM604,Grafika Komputer,1,1,1
-STT201,Metode Statistika I,3,3,1
-STT202,Statistika Deskriptif,2,2,1
-STT203,Matematika Statistika,1,1,1
-STT204,Metode Pengambilan Sampel,1,1,1
-STT401,Statistika Matematika I,2,2,1
-STT402,Komputasi Statistika,4,4,1
-STT403,Analisis Data Kategori,3,3,1
-STT404,Rancangan Percobaan I,1,1,1
-STT601,Analisis Regresi,3,3,1
-STT602,Analisis Deret Waktu,2,2,1
-STT603,Statistika Nonparametrik,1,1,1
-STT604,Multivariat Statistika,1,1,1
-TIN201,Pengantar Industri Pertanian,4,4,1
-TIN202,Kimia Organik Industri,3,3,1
-TIN203,Mikrobiologi Industri,2,2,1
-TIN204,Satuan Operasi I,1,1,1
-TIN401,Analisis Sistem Industri,4,4,1
-TIN402,Ekonomi Teknik,2,2,1
-TIN403,Teknik Tata Cara Kerja,3,3,1
-TIN404,Perancangan Produk,1,1,1
-TIN601,Pengendalian Mutu,4,4,1
-TIN602,Tata Letak Pabrik,3,3,1
-TIN603,Pemasaran Industri,1,1,1
-TIN604,Manajemen Strategik,1,1,1
-TEP201,Teknik Biosistem,4,4,1
-TEP202,Menggambar Teknik,3,3,1
-TEP203,Mekanika Teknik,2,2,1
-TEP204,Dasar Biosistem,1,1,1
-TEP401,Termodinamika,4,4,1
-TEP402,Mekanika Fluida,2,2,1
-TEP403,Kelistrikan Pertanian,3,3,1
-TEP404,Energi dan Mesin Pertanian,1,1,1
-TEP601,Alat Mesin Pertanian,2,2,1
-TEP602,Teknik Pascapanen,3,3,1
-TEP603,Instrumentasi Pengendalian,1,1,1
-TEP604,Sistem Informasi Geografi,2,2,1
-MAN201,Pengantar Manajemen,4,4,1
-MAN202,Perilaku Organisasi,3,3,1
-MAN203,Ekonomi Mikro Manajerial,2,2,1
-MAN204,Akuntansi Manajemen,1,1,1
-MAN401,Manajemen Keuangan,4,4,1
-MAN402,Manajemen Pemasaran,2,2,1
-MAN403,Manajemen Operasi,3,3,1
-MAN404,Riset Pemasaran,1,1,1
-MAN601,Manajemen Strategik,4,4,1
-MAN602,Kewirausahaan,3,3,1
-MAN603,Manajemen SDM,1,1,1
-MAN604,Bisnis Internasional,1,1,1
-EKO201,Mikroekonomi I,4,4,1
-EKO202,Matematika Ekonomi,3,3,1
-EKO203,Statistika Ekonomi,2,2,1
-EKO204,Akuntansi Dasar,1,1,1
-EKO401,Makroekonomi I,4,4,1
-EKO402,Ekonometrika I,2,2,1
-EKO403,Ekonomi Moneter I,3,3,1
-EKO404,Ekonomi Publik I,1,1,1
-EKO601,Ekonomi Pembangunan,2,2,1
-EKO602,Sejarah Pemikiran Ekonomi,3,3,1
-EKO603,Ekonomi Internasional,2,2,1
-EKO604,Ekonomi Regional,1,1,1
-GIZ201,Dasar Nutrisi,4,4,1
-GIZ202,Kimia Gizi,3,3,1
-GIZ203,Anatomi Fisiologi,2,2,1
-GIZ204,Sosio-Antropologi Gizi,1,1,1
-GIZ401,Dietetika,4,4,1
-GIZ402,Gizi Daur Kehidupan,2,2,1
-GIZ403,Penilaian Status Gizi,3,3,1
-GIZ404,Kemanan Pangan,1,1,1
-GIZ601,Gizi Masyarakat,4,4,1
-GIZ602,Konseling Gizi,3,3,1
-GIZ603,Gizi Olahraga,1,1,1
-GIZ604,Epidemiologi Gizi,4,4,1
-KPM201,Pengantar Sosiologi,4,4,1
-KPM202,Antropologi Sosial,3,3,1
-KPM203,Ekologi Politik,2,2,1
-KPM204,Dasar Komunikasi,1,1,1
-KPM401,Penyuluhan Pembangunan,4,4,1
-KPM402,Sosiologi Pedesaan,2,2,1
-KPM403,Metode Penelitian Sosial,3,3,1
-KPM404,Gender dan Pembangunan,1,1,1
-KPM601,Komunikasi Politik,2,2,1
-KPM602,Pengembangan Kelembagaan,3,3,1
-KPM603,Resolusi Konflik,2,2,1
-KPM604,Corporate Social Responsibility,1,1,1
-INTP201,Anatomi Ternak,4,4,1
-INTP202,Dasar Fisiologi Ternak,3,3,1
-INTP203,Dasar Genetika Ternak,2,2,1
-INTP204,Pengantar Ilmu Pakan,1,1,1
-INTP401,Nutrisi Ternak,4,4,1
-INTP402,Bahan Pakan Ternak,2,2,1
-INTP403,Tatalaksana Padang Penggembalaan,3,3,1
-INTP404,Manajemen Ternak Potong,1,1,1
-INTP601,Fisiologi Reproduksi,4,4,1
-INTP602,Pemuliaan Ternak,3,3,1
-INTP603,Teknologi Pakan,1,1,1
+FPT102,Pengantar Peternakan,5,3,1
+KOM201,Pemrograman Dasar,7,4,1
+KOM202,PBO,5,3,1
+KOM203,Matematika Diskrit,4,2,2
+KOM204,Arsitektur Komputer,10,5,2
+KOM401,Struktur Data,6,3,2
+KOM402,Sistem Operasi,9,5,1
+KOM403,Analisis Algoritma,5,3,1
+KOM404,Basis Data,2,1,2
+KOM601,Jaringan Komputer,3,2,1
+KOM602,Rekayasa Perangkat Lunak,6,3,2
+KOM603,Kecerdasan Buatan,4,2,2
+KOM604,Grafika Komputer,9,5,1
+STT201,Metode Statistika I,7,4,1
+STT202,Statistika Deskriptif,5,3,1
+STT203,Matematika Statistika,8,4,2
+STT204,Metode Pengambilan Sampel,4,2,2
+STT401,Statistika Matematika I,7,4,1
+STT402,Komputasi Statistika,10,5,2
+STT403,Analisis Data Kategori,5,3,1
+STT404,Rancangan Percobaan I,8,4,2
+STT601,Analisis Regresi,8,4,2
+STT602,Analisis Deret Waktu,6,3,2
+STT603,Statistika Nonparametrik,3,2,1
+STT604,Multivariat Statistika,4,2,2
+TIN201,Pengantar Industri Pertanian,5,3,1
+TIN202,Kimia Organik Industri,1,1,1
+TIN203,Mikrobiologi Industri,10,5,2
+TIN204,Satuan Operasi I,2,1,2
+TIN401,Analisis Sistem Industri,6,3,2
+TIN402,Ekonomi Teknik,7,4,1
+TIN403,Teknik Tata Cara Kerja,9,5,1
+TIN404,Perancangan Produk,2,1,2
+TIN601,Pengendalian Mutu,8,4,2
+TIN602,Tata Letak Pabrik,6,3,2
+TIN603,Pemasaran Industri,2,1,2
+TIN604,Manajemen Strategik,9,5,1
+TEP201,Teknik Biosistem,5,3,1
+TEP202,Menggambar Teknik,7,4,1
+TEP203,Mekanika Teknik,10,5,2
+TEP204,Dasar Biosistem,2,1,2
+TEP401,Termodinamika,6,3,2
+TEP402,Mekanika Fluida,8,4,2
+TEP403,Kelistrikan Pertanian,10,5,2
+TEP404,Energi dan Mesin Pertanian,2,1,2
+TEP601,Alat Mesin Pertanian,8,4,2
+TEP602,Teknik Pascapanen,6,3,2
+TEP603,Instrumentasi Pengendalian,2,1,2
+TEP604,Sistem Informasi Geografi,10,5,2
+MAN201,Pengantar Manajemen,7,4,1
+MAN202,Perilaku Organisasi,4,2,2
+MAN203,Ekonomi Mikro Manajerial,10,5,2
+MAN204,Akuntansi Manajemen,2,1,2
+MAN401,Manajemen Keuangan,1,1,1
+MAN402,Manajemen Pemasaran,9,5,1
+MAN403,Manajemen Operasi,8,4,2
+MAN404,Riset Pemasaran,2,1,2
+MAN601,Manajemen Strategik,3,2,1
+MAN602,Kewirausahaan,8,4,2
+MAN603,Manajemen SDM,4,2,2
+MAN604,Bisnis Internasional,2,1,2
+EKO201,Mikroekonomi I,7,4,1
+EKO202,Matematika Ekonomi,1,1,1
+EKO203,Statistika Ekonomi,10,5,2
+EKO204,Akuntansi Dasar,4,2,2
+EKO401,Makroekonomi I,7,4,1
+EKO402,Ekonometrika I,10,5,2
+EKO403,Ekonomi Moneter I,8,4,2
+EKO404,Ekonomi Publik I,2,1,2
+EKO601,Ekonomi Pembangunan,3,2,1
+EKO602,Sejarah Pemikiran Ekonomi,8,4,2
+EKO603,Ekonomi Internasional,4,2,2
+EKO604,Ekonomi Regional,2,1,2
+GIZ201,Dasar Nutrisi,7,4,1
+GIZ202,Kimia Gizi,5,3,1
+GIZ203,Anatomi Fisiologi,3,2,1
+GIZ204,Sosio-Antropologi Gizi,2,1,2
+GIZ401,Dietetika,6,3,2
+GIZ402,Gizi Daur Kehidupan,7,4,1
+GIZ403,Penilaian Status Gizi,9,5,1
+GIZ404,Kemanan Pangan,2,1,2
+GIZ601,Gizi Masyarakat,3,2,1
+GIZ602,Konseling Gizi,8,4,2
+GIZ603,Gizi Olahraga,6,3,2
+GIZ604,Epidemiologi Gizi,2,1,2
+KPM201,Pengantar Sosiologi,7,4,1
+KPM202,Antropologi Sosial,5,3,1
+KPM203,Ekologi Politik,3,2,1
+KPM204,Dasar Komunikasi,2,1,2
+KPM401,Penyuluhan Pembangunan,6,3,2
+KPM402,Sosiologi Pedesaan,8,4,2
+KPM403,Metode Penelitian Sosial,10,5,2
+KPM404,Gender dan Pembangunan,2,1,2
+KPM601,Komunikasi Politik,3,2,1
+KPM602,Pengembangan Kelembagaan,8,4,2
+KPM603,Resolusi Konflik,6,3,2
+KPM604,Corporate Social Responsibility,2,1,2
+INTP201,Anatomi Ternak,4,2,2
+INTP202,Dasar Fisiologi Ternak,7,4,1
+INTP203,Dasar Genetika Ternak,3,2,1
+INTP204,Pengantar Ilmu Pakan,2,1,2
+INTP401,Nutrisi Ternak,5,3,1
+INTP402,Bahan Pakan Ternak,7,4,1
+INTP403,Tatalaksana Padang Penggembalaan,9,5,1
+INTP404,Manajemen Ternak Potong,2,1,2
+INTP601,Fisiologi Reproduksi,4,2,2
+INTP602,Pemuliaan Ternak,8,4,2
+INTP603,Teknologi Pakan,6,3,2
 INTP604,Tatalaksana Ternak Perah,1,1,1
-IPB201,Dasar Agronomi,4,4,1
-IPB202,Dasar Genetika Tumbuhan,3,3,1
-IPB203,Dasar Hortikultura,2,2,1
+IPB201,Dasar Agronomi,3,2,1
+IPB202,Dasar Genetika Tumbuhan,7,4,1
+IPB203,Dasar Hortikultura,10,5,2
 IPB204,Kesuburan Tanah,1,1,1
-IPB401,Fisiologi Tumbuhan,4,4,1
-IPB402,Agroklimatologi,2,2,1
-IPB403,Ilmu Gulma,3,3,1
+IPB401,Fisiologi Tumbuhan,5,3,1
+IPB402,Agroklimatologi,8,4,2
+IPB403,Ilmu Gulma,10,5,2
 IPB404,Teknologi Benih I,1,1,1
-IPB601,Perlindungan Tanaman,2,2,1
-IPB602,Pemuliaan Tanaman,3,3,1
-IPB603,Bioteknologi Tanaman,2,2,1
+IPB601,Perlindungan Tanaman,4,2,2
+IPB602,Pemuliaan Tanaman,8,4,2
+IPB603,Bioteknologi Tanaman,6,3,2
 IPB604,Pertanian Berkelanjutan,1,1,1
-KOM701,Deep Learning,2,2,1
-KOM702,Cloud Computing,3,3,1
-STT701,Big Data Analytics,4,4,1
-STT702,Machine Learning,2,2,1
-TIN701,Logistik Rantai Pasok,2,2,1
-TEP701,Energi Terbarukan,4,4,1
-MAN701,Perilaku Konsumen,2,2,1
-EKO701,Ekonometrika Terapan,4,4,1
-GIZ701,Pangan Fungsional,2,2,1
-KPM701,Pengembangan Masyarakat,4,4,1
-INTP701,Industri Pakan,2,2,1
-IPB701,Pemuliaan Tanaman Lanjut,4,4,1
+KOM701,Deep Learning,10,5,2
+KOM702,Cloud Computing,8,4,2
+STT701,Big Data Analytics,9,5,1
+STT702,Machine Learning,1,1,1
+TIN701,Logistik Rantai Pasok,1,1,1
+TEP701,Energi Terbarukan,9,5,1
+MAN701,Perilaku Konsumen,10,5,2
+EKO701,Ekonometrika Terapan,9,5,1
+GIZ701,Pangan Fungsional,10,5,2
+KPM701,Pengembangan Masyarakat,9,5,1
+INTP701,Industri Pakan,10,5,2
+IPB701,Pemuliaan Tanaman Lanjut,9,5,1

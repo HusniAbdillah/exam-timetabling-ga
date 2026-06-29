@@ -147,7 +147,9 @@ def run_ga(
         config.population_size,
         config.max_generations,
     )
-
+    print(
+        f"Starting GA: courses={num_courses}, timeslots={num_timeslots}, population={config.population_size}, generations={config.max_generations}, repair={config.enable_repair}"
+    )
     start_time = time.monotonic()
 
     population: Population = initialize_population(
@@ -176,11 +178,14 @@ def run_ga(
 
         fitness_history.append(best_fitness)
 
-        logger.debug(
-            "Generation %d/%d — best_fitness=%.2f",
+        logger.info(
+            "Generation %d/%d - best_fitness=%.2f",
             generation,
             config.max_generations,
             best_fitness,
+        )
+        print(
+            f"Generation {generation}/{config.max_generations} - best_fitness={best_fitness:.2f}"
         )
 
         # ------------------------------------------------------------------ #
@@ -228,7 +233,7 @@ def run_ga(
                 child1 = move_mutation(child1, num_timeslots, config.mutation_rate)
                 child2 = move_mutation(child2, num_timeslots, config.mutation_rate)
 
-            # Apply greedy repair if enabled (Memetic GA local search probability = 0.2)
+            # Apply greedy repair if enabled (Memetic GA local search probability = 0.20)
             if config.enable_repair and random.random() < 0.20:
                 child1 = repair_chromosome(
                     child1, courses, conflict_matrix, timeslots, fitness_fn
@@ -250,6 +255,9 @@ def run_ga(
         best_fitness,
         generation,
         execution_time,
+    )
+    print(
+        f"GA complete: best_fitness={best_fitness:.2f}, generations={generation}, time={execution_time:.3f}s"
     )
 
     return GAResult(

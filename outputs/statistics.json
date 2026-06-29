@@ -1,26 +1,26 @@
 {
   "pure_ga": {
-    "execution_time_seconds": 21.578000000008615,
-    "best_fitness": 1202688.5,
-    "hard_constraint_violations": 1198,
-    "consecutive_exams_violations": 0,
-    "too_many_exams_violations": 18,
-    "spread_penalty": 22.25
+    "execution_time_seconds": 24.14100000000326,
+    "best_fitness": 138813.0,
+    "hard_constraint_violations": 123,
+    "consecutive_exams_violations": 911,
+    "too_many_exams_violations": 13,
+    "spread_penalty": 6.0
   },
   "greedy": {
-    "execution_time_seconds": 14.264999999999418,
-    "best_fitness": 1221557.5,
-    "hard_constraint_violations": 1216,
-    "consecutive_exams_violations": 0,
-    "too_many_exams_violations": 25,
-    "spread_penalty": 4.25
+    "execution_time_seconds": 14.09299999999348,
+    "best_fitness": 8522.0,
+    "hard_constraint_violations": 0,
+    "consecutive_exams_violations": 740,
+    "too_many_exams_violations": 0,
+    "spread_penalty": 12.6
   },
   "hybrid_ga": {
-    "execution_time_seconds": 19.077999999994063,
-    "best_fitness": 1114518.5,
-    "hard_constraint_violations": 1114,
-    "consecutive_exams_violations": 0,
+    "execution_time_seconds": 97.25,
+    "best_fitness": 7771.0,
+    "hard_constraint_violations": 0,
+    "consecutive_exams_violations": 663,
     "too_many_exams_violations": 0,
-    "spread_penalty": 7.25
+    "spread_penalty": 4.8
   }
 }
