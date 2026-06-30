@@ -1,7 +1,7 @@
 #import "@preview/bamdone-ieeeconf:0.1.3": *
 
 #show: ieee.with(
-  title: [Optimasi Penjadwalan Ujian Universitas Menggunakan Algoritma Genetika],
+  title: [Penerapan Evolutionary Computation Menggunakan Genetic Algorithm untuk Optimasi Penjadwalan Ujian Universitas],
   abstract: [
     Penyusunan jadwal ujian universitas merupakan permasalahan optimasi kombinatorial yang kompleks karena harus menempatkan banyak mata kuliah pada slot waktu terbatas sambil menghindari bentrokan ujian mahasiswa. Penelitian ini menyajikan implementasi #emph[Genetic Algorithm] (GA) untuk #emph[University Examination Timetabling Problem] (UETP) dengan representasi kromosom satu dimensi, #emph[tournament selection], #emph[one-point] dan #emph[uniform crossover], #emph[swap] dan #emph[move mutation], elitisme, serta varian Hybrid GA yang memanfaatkan solusi Greedy dan mekanisme #emph[repair] lokal. Kualitas solusi dihitung sebagai total penalti dari #emph[hard constraint] dan #emph[soft constraint], sehingga nilai yang lebih rendah menunjukkan jadwal yang lebih baik. Eksperimen pada #emph[dataset] simulasi berisi 2.340 mahasiswa, 150 mata kuliah, 6.220 relasi #emph[enrollment], 10 slot ujian, dan 10 ruang menunjukkan bahwa Hybrid GA menghasilkan penalti terbaik 1.114.518,5 pada eksperimen utama, lebih rendah daripada Pure GA 1.202.688,5 dan Greedy 1.221.557,5. Pada pengujian 30 kali, Hybrid GA juga memperoleh rata-rata penalti lebih rendah dan simpangan baku lebih kecil dibanding Pure GA. Hasil ini menunjukkan bahwa pendekatan evolusioner, terutama saat dikombinasikan dengan #emph[seed] Greedy dan #emph[repair] lokal, efektif untuk meningkatkan kualitas jadwal ujian dibanding #emph[baseline] deterministik.
   ],
@@ -48,7 +48,13 @@
   bibliography: bibliography("refs.bib"),
   draft: false,
   paper-size: "us-letter",
+  disclaimer: [],
 )
+
+#show figure.where(kind: image): set figure(supplement: [Gambar])
+#show figure.where(kind: table): set figure(supplement: [Tabel])
+#show figure.caption: set align(center)
+#set par(first-line-indent: (amount: 1em, all: true))
 
 = Pendahuluan <sec:pendahuluan>
 == Latar Belakang
@@ -197,9 +203,9 @@ Fungsi objektif sistem adalah minimisasi total penalti. Nilai #emph[fitness] dih
 
 #align(center)[
   $
-    P &= 1000H + 10C + 5D + 30S \
-      &+ 3M + 2E + G + 5F \
-      &+ 200X + 300R + 250B
+    P & = 1000H + 10C + 5D + 30S \
+      & + 3M + 2E + G + 5F \
+      & + 200X + 300R + 250B
   $
 ]
 
