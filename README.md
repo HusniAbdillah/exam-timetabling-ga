@@ -15,6 +15,8 @@ Implementasi **Genetic Algorithm (GA)** untuk menyelesaikan permasalahan **Unive
 
   Repositori ini dapat diakses di [github.com/HusniAbdillah/exam-timetabling-ga](https://github.com/HusniAbdillah/exam-timetabling-ga)
 
+  Aplikasi Web (Live Demo) dapat diakses di [exam-timetabling-ga.streamlit.app](https://exam-timetabling-ga.streamlit.app/)
+
   > Dikembangkan untuk memenuhi tugas mata kuliah **Pengantar Kecerdasan Komputasional** - Kelompok 17
 </div>
 
