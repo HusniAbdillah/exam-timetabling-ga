@@ -48,6 +48,7 @@
   bibliography: bibliography("refs.bib"),
   draft: false,
   paper-size: "us-letter",
+  disclaimer: [],
 )
 
 #show figure.where(kind: image): set figure(supplement: [Gambar])
