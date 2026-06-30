@@ -53,6 +53,7 @@
 #show figure.where(kind: image): set figure(supplement: [Gambar])
 #show figure.where(kind: table): set figure(supplement: [Tabel])
 #show figure.caption: set align(center)
+#set par(first-line-indent: (amount: 1em, all: true))
 
 = Pendahuluan <sec:pendahuluan>
 == Latar Belakang
